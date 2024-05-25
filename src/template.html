@@ -30,17 +30,18 @@
     <title>Mapty // Map your workouts</title>
   </head>
   <body>
-    <div class="grid__wrapper">
-      <aside class="aside">
-        <form class="form hidden">
-          <div class="form__row">
+    <div class="grid__wrapper [ grid-container ]">
+      <aside class="aside [ flex-center flex-col ]">
+        <img src="assets/img/logo.png" alt="logo" class="logo [ flex-start ]" />
+        <form class="form [ visually-hide ] [ grid-form ]">
+          <div class="form__row [ grid-form-row ]">
             <label for="type" class="form__label">Type</label>
             <select name="type" class="form__input form__input--type">
               <option value="running">Running</option>
               <option value="cycling">Cycling</option>
             </select>
           </div>
-          <div class="form__row">
+          <div class="form__row [ grid-form-row ]">
             <label for="distance" class="form__label">Distance</label>
             <input
               type="text"
@@ -48,7 +49,7 @@
               placeholder="km"
             />
           </div>
-          <div class="form__row">
+          <div class="form__row [ grid-form-row ]">
             <label for="duration" class="form__label">Duration</label>
             <input
               type="text"
@@ -56,7 +57,7 @@
               placeholder="min"
             />
           </div>
-          <div class="form__row">
+          <div class="form__row [ grid-form-row ]">
             <label for="cadence" class="form__label">Cadence</label>
             <input
               type="text"
@@ -64,7 +65,7 @@
               placeholder="step/min"
             />
           </div>
-          <div class="form__row form__row--dislay-none">
+          <div class="form__row [ hidden ] [ grid-form-row ]">
             <label for="elev-gain" class="form__label">Elev Gain</label>
             <input
               type="text"
@@ -75,7 +76,6 @@
         </form>
 
         <ul class="workouts">
-          <!-- 
           <li class="workout workout--running">
             <h2 class="workout__title">Running on 23 May 2024</h2>
             <div class="workout__details">
@@ -121,40 +121,41 @@
               <span class="workout__value">223</span>
               <span class="workout__unit">m</span>
             </div>
-          </li> -->
+          </li>
         </ul>
 
-        <p class="my__details">
-          This website was developed to learn Javascript as part of Jonas
-          Schmedtmanns course:
-          <a
-            href="https://www.udemy.com/the-complete-javascript-course/"
-            class="footer-link"
-            >The Complete JavaScript course 2024: From zero to expert.</a
-          >
-          The original template was not responsive, so I have made it responsive
-          using the CSS Grid and Flexbox.<br />
-          Built with 🖤 by Sho'ayb
-          <a
-            href="https://github.com/Sho-ayb"
-            target="_blank"
-            class="github-icon"
-            ><i class="bx bxl-github"></i
-          ></a>
-          <a
-            href="https://www.linkedin.com/in/shoaybchoudhry"
-            target="_blank"
-            class="linkedin-icon"
-            ><i class="bx bxl-linkedin-square"></i
-          ></a>
-        </p>
-        <p class="copyright">
-          <a href="https://twitter.com/jonasschmedtman" class="footer-link"
-            >&copy; Copyright by Jonas Schmedtmann:</a
-          >
-          Use for learning or your portfolio. Don't use to teach. Don't claim as
-          your own product.
-        </p>
+        <div class="aside__footer [ flex-center flex-col ]">
+          <p class="my__details [ mg-auto-80 ]">
+            This website was developed to learn Javascript as part of Jonas
+            Schmedtmanns course:
+            <a
+              href="https://www.udemy.com/the-complete-javascript-course/"
+              target="_blank"
+              >The Complete JavaScript course 2024: From zero to expert.</a
+            >
+            The original template was not responsive, so I have made it
+            responsive using the CSS Grid and Flexbox.<br />
+            Built with 🖤 by Sho'ayb
+            <a
+              href="https://github.com/Sho-ayb"
+              target="_blank"
+              class="github-icon"
+              ><i class="bx bxl-github"></i
+            ></a>
+            <a
+              href="https://www.linkedin.com/in/shoaybchoudhry"
+              target="_blank"
+              class="linkedin-icon"
+              ><i class="bx bxl-linkedin-square"></i
+            ></a>
+          </p>
+          <p class="copyright [ mg-auto-80 ]">
+            &copy; Copyright by
+            <a href="https://twitter.com/jonasschmedtman">Jonas Schmedtmann:</a>
+            Use for learning or your portfolio. Don't use to teach. Don't claim
+            as your own product.
+          </p>
+        </div>
       </aside>
 
       <main class="main">

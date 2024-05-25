@@ -1,0 +1,15 @@
+@use "../base/variables" as variables;
+
+body .aside a {
+  text-decoration: none;
+
+  &:link,
+  &:visited {
+    color: variables.$color-primary;
+  }
+
+  &:hover,
+  &:active {
+    color: variables.$color-secondary;
+  }
+}

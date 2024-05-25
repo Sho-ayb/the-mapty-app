@@ -1,0 +1,13 @@
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  @media (width >= 78.125rem) {
+    justify-content: space-evenly;
+  }
+}
+
+.flex-col {
+  flex-direction: column;
+}

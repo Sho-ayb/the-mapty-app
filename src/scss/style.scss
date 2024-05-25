@@ -4,9 +4,16 @@
 @use "base/variables" as variables;
 
 // Blocks
+@use "blocks/hyper-links";
 
 // Compositions
+@use "compositions/grids";
+@use "compositions/flexs";
 
 // Components
+@use "components/aside";
+@use "components/main";
 
 // Utilities
+@use "utilities/hiding";
+@use "utilities/autos";
