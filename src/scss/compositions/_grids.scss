@@ -1,0 +1,27 @@
+@use "../base/variables" as variables;
+
+// Mobile view < 768px width
+
+.grid-container {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  grid-template-columns: 1fr;
+
+  @media (width >= 78.125rem) {
+    grid-template-rows: 1fr;
+    grid-template-columns: 35% 1fr;
+  }
+}
+
+.grid-form {
+  display: grid;
+  grid-template-rows: auto;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.grid-form-row {
+  display: grid;
+  grid-template-rows: auto;
+  grid-template-columns: 100px 1fr;
+}

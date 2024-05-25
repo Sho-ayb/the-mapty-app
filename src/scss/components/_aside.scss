@@ -1,0 +1,38 @@
+@use "../base/variables" as variables;
+
+body .grid__wrapper .aside {
+  font-size: clamp(0.875rem, 0.875rem + 1.2vw, 1.2rem);
+  color: variables.$color-text-light-1;
+  background-color: variables.$color-background-dark-1;
+
+  > .logo {
+    max-width: 100%;
+    height: 5.2rem;
+    margin: variables.$spacing-lg 0;
+  }
+
+  .aside__footer > p {
+    text-align: center;
+    padding: variables.$spacing-sm;
+
+    &:not(:last-child) {
+      margin-bottom: variables.$spacing-sm;
+    }
+
+    @media (width >= 78.125rem) {
+      text-align: left;
+    }
+  }
+}
+
+body .grid__wrapper {
+  min-height: 100vh;
+}
+
+body .form {
+  margin-bottom: variables.$spacing-lg;
+}
+
+body .workout {
+  margin-bottom: variables.$spacing-lg;
+}
