@@ -1,5 +1,9 @@
+@use "../base/variables" as variables;
+
 body {
-  @media (min-width: 90.625rem) {
+  color: variables.$color-text-light-2;
+
+  @media (width >= 90.625rem) {
     width: 95%;
     margin-inline: auto;
   }
