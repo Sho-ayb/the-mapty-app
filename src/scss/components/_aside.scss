@@ -1,7 +1,7 @@
 @use "../base/variables" as variables;
 
 body .grid__wrapper .aside {
-  font-size: clamp(0.875rem, 0.875rem + 1.2vw, 1.2rem);
+  //   font-size: clamp(0.875rem, 0.875rem + 1.2vw, 1.2rem);
   color: variables.$color-text-light-1;
   background-color: variables.$color-background-dark-1;
 
@@ -14,6 +14,7 @@ body .grid__wrapper .aside {
   .aside__footer > p {
     text-align: center;
     padding: variables.$spacing-sm;
+    font-size: variables.$font-size-sm;
 
     &:not(:last-child) {
       margin-bottom: variables.$spacing-sm;
@@ -30,9 +31,41 @@ body .grid__wrapper {
 }
 
 body .form {
+  font-size: variables.$font-size-lg;
   margin-bottom: variables.$spacing-lg;
+}
+
+body .workouts {
+  margin: 0 variables.$spacing-md variables.$spacing-lg variables.$spacing-md;
+  font-size: clamp(0.5rem, 0.5rem + 1vw, 1.1rem);
 }
 
 body .workout {
   margin-bottom: variables.$spacing-lg;
+  padding: variables.$spacing-lg;
+  background-color: variables.$color-background-dark-2;
+  border-radius: 6px;
+
+  &__details {
+    font-size: 0.875rem;
+    display: flex;
+    justify-content: left;
+    align-items: baseline;
+  }
+
+  &__icon {
+    margin-right: 5px;
+  }
+
+  &__value {
+    margin-right: 5px;
+  }
+
+  &--running {
+    border-left: 5px solid variables.$color-primary;
+  }
+
+  &--cycling {
+    border-left: 5px solid variables.$color-secondary;
+  }
 }

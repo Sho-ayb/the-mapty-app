@@ -18,10 +18,34 @@
   grid-template-rows: auto;
   grid-template-columns: 1fr;
   gap: 10px;
+
+  @media (width >= 37.5rem) {
+    grid-template-columns: repeat(2, 0.5fr);
+    grid-template-rows: repeat(2, auto);
+  }
 }
 
 .grid-form-row {
   display: grid;
   grid-template-rows: auto;
   grid-template-columns: 100px 1fr;
+
+  @media (width >= 37.5rem) {
+    grid-template-columns: 100px 103px;
+  }
+}
+
+.grid-workout {
+  display: grid;
+  grid-template-rows: auto auto;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75em 0.5em;
+
+  .workout__title {
+    grid-column: 1 / span 4;
+  }
+
+  .workout__details {
+    grid-row: 2 / 3;
+  }
 }
