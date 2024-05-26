@@ -1,8 +1,7 @@
 @use "../base/variables" as variables;
 
 body .grid__wrapper .aside {
-  //   font-size: clamp(0.875rem, 0.875rem + 1.2vw, 1.2rem);
-  color: variables.$color-text-light-1;
+  overflow-x: hidden;
   background-color: variables.$color-background-dark-1;
 
   > .logo {
@@ -15,6 +14,7 @@ body .grid__wrapper .aside {
     text-align: center;
     padding: variables.$spacing-sm;
     font-size: variables.$font-size-sm;
+    color: variables.$color-text-light-1;
 
     &:not(:last-child) {
       margin-bottom: variables.$spacing-sm;
@@ -33,9 +33,25 @@ body .grid__wrapper {
 body .form {
   font-size: variables.$font-size-lg;
   margin-bottom: variables.$spacing-lg;
+  background-color: variables.$color-background-dark-2;
+  padding: variables.$spacing-lg;
+  border-radius: 6px;
   transition:
     all 0.5s,
     transform 1ms;
+
+  &__input {
+    font-family: inherit;
+    border: none;
+    border-radius: 3px;
+    background-color: variables.$color-text-light-3;
+    transition: all 0.2s;
+
+    &:focus {
+      outline: none;
+      background-color: variables.$color-text-light-2;
+    }
+  }
 }
 
 body .workouts {
@@ -62,7 +78,12 @@ body .workout {
   }
 
   &__value {
+    color: variables.$color-text-light-2;
     margin-right: 5px;
+  }
+
+  &__unit {
+    color: variables.$color-text-light-1;
   }
 
   &--running {
