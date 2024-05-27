@@ -20,5 +20,8 @@
       { "singleQuote": true, "trailingComma": "es5" }
     ]
   },
+  "globals": {
+    "L": "readonly"
+  },
   "plugins": ["prettier"]
 }
