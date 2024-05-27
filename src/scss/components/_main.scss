@@ -3,4 +3,8 @@
 body .main {
   overflow-x: hidden;
   background-color: variables.$color-background;
+
+  .map {
+    height: 100%;
+  }
 }
