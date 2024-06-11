@@ -198,18 +198,17 @@ const init = async () => {
   appInstance.renderMap(coords);
   appInstance.mapOnClick((newCoords) => {
     //   clear up the formEl event listener - since the form is submitted
-    formEl.removeEventListener('submit', handleFormSubmitListener);
 
     // show the form when the user clicks on the map
 
     appInstance.showForm();
     handleTypeChange();
 
-    setTimeout(() => {
-      formEl.addEventListener('submit', (event) =>
-        handleFormSubmitListener(event, newCoords, appInstance)
-      );
-    }, 1000);
+    formEl.addEventListener(
+      'submit',
+      (event) => handleFormSubmitListener(event, newCoords, appInstance),
+      { once: true }
+    );
   });
 };
 
