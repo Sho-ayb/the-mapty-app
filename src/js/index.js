@@ -167,25 +167,60 @@ const handleTypeChange = function () {
   });
 };
 
+// Checking if all inputs are valid numerals
+const validInputs = function (...inputs) {
+  return inputs.every((inp) => Number.isFinite(inp));
+};
+
+// Checking if all inputs are positive numbers
+
+const allPositive = function (...inputs) {
+  return inputs.every((inp) => inp > 0);
+};
+
+const handleInputs = function (distance, duration, cadence, elevation) {
+  if (
+    (!validInputs(distance, duration, cadence) &&
+      !allPositive(distance, duration, cadence)) ||
+    (!validInputs(distance, duration, elevation) &&
+      !allPositive(distance, duration))
+  )
+    throw new Error(
+      'Except for Elevation: all inputs should be positive numbers'
+    );
+};
+
 const handleFormSubmit = function (event, newCoords, appInstance) {
   event.preventDefault();
 
   const formData = new FormData(event.target);
   const type = formData.get('type');
-  const distance = formData.get('distance');
-  const duration = formData.get('duration');
-  const cadence = formData.get('cadence');
-  const elevationGain = formData.get('elev-gain');
+  const distance = Number(formData.get('distance'));
+  const duration = Number(formData.get('duration'));
+  const cadence = Number(formData.get('cadence'));
+  const elevation = Number(formData.get('elev-gain'));
 
-  console.log(type, distance, duration, cadence, elevationGain);
+  console.log(type, distance, duration, cadence, elevation);
 
-  const coords = newCoords;
+  try {
+    if (type === 'running') {
+      handleInputs(distance, duration, cadence);
+    }
 
-  appInstance.mapMarker(coords);
+    if (type === 'cycling') {
+      handleInputs(distance, duration, elevation);
+    }
 
-  formEl.classList.add('visually-hide');
+    const coords = newCoords;
 
-  clearInputs(distanceInput, durationInput, cadenceInput, elevationGainInput);
+    appInstance.mapMarker(coords);
+
+    formEl.classList.add('visually-hide');
+
+    clearInputs(distanceInput, durationInput, cadenceInput, elevationGainInput);
+  } catch (error) {
+    console.error(error.message);
+  }
 };
 
 const handleFormSubmitListener = function (event, newCoords, appInstance) {
@@ -197,13 +232,12 @@ const init = async () => {
   const coords = await appInstance.getGeoCoords();
   appInstance.renderMap(coords);
   appInstance.mapOnClick((newCoords) => {
-    //   clear up the formEl event listener - since the form is submitted
-
     // show the form when the user clicks on the map
 
     appInstance.showForm();
     handleTypeChange();
 
+    //  the option once:true ensures that the event listener is immediately removed once added
     formEl.addEventListener(
       'submit',
       (event) => handleFormSubmitListener(event, newCoords, appInstance),
