@@ -178,16 +178,43 @@ const allPositive = function (...inputs) {
   return inputs.every((inp) => inp > 0);
 };
 
-const handleInputs = function (distance, duration, cadence, elevation) {
-  if (
-    (!validInputs(distance, duration, cadence) &&
-      !allPositive(distance, duration, cadence)) ||
-    (!validInputs(distance, duration, elevation) &&
-      !allPositive(distance, duration))
-  )
-    throw new Error(
-      'Except for Elevation: all inputs should be positive numbers'
-    );
+const handleInputs = function (type, distance, duration, cadence, elevation) {
+  if (type === 'running') {
+    if (
+      !validInputs(distance, duration, cadence) ||
+      !allPositive(distance, duration, cadence)
+    ) {
+      throw new Error('Inputs for running must be positive numbers!');
+    }
+  } else if (type === 'cycling') {
+    if (
+      !validInputs(distance, duration, elevation) &&
+      !allPositive(distance, duration)
+    ) {
+      throw new Error(
+        'Inputs for distance and duration must be positive numbers!'
+      );
+    }
+  }
+};
+
+const showModal = function (errorMsg) {
+  const modal = document.getElementById('modal');
+  const closeModal = document.querySelector('.modal__close');
+  const modalMsg = document.querySelector('.modal__message');
+
+  modal.classList.remove('hidden');
+  formEl.classList.add('visually-hide');
+
+  modalMsg.textContent = errorMsg;
+
+  closeModal.onclick = function () {
+    modal.classList.add('hidden');
+  };
+
+  window.onclick = function () {
+    modal.classList.add('hidden');
+  };
 };
 
 const handleFormSubmit = function (event, newCoords, appInstance) {
@@ -204,11 +231,9 @@ const handleFormSubmit = function (event, newCoords, appInstance) {
 
   try {
     if (type === 'running') {
-      handleInputs(distance, duration, cadence);
-    }
-
-    if (type === 'cycling') {
-      handleInputs(distance, duration, elevation);
+      handleInputs(type, distance, duration, cadence);
+    } else if (type === 'cycling') {
+      handleInputs(type, distance, duration, elevation);
     }
 
     const coords = newCoords;
@@ -219,7 +244,8 @@ const handleFormSubmit = function (event, newCoords, appInstance) {
 
     clearInputs(distanceInput, durationInput, cadenceInput, elevationGainInput);
   } catch (error) {
-    console.error(error.message);
+    showModal(error.message);
+    clearInputs(distanceInput, durationInput, cadenceInput, elevationGainInput);
   }
 };
 

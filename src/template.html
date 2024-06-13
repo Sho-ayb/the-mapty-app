@@ -77,7 +77,7 @@
               placeholder="meters"
             />
           </div>
-          <button class="form__btn hidden">OK</button>
+          <button class="form__btn [ hidden ]">OK</button>
         </form>
 
         <ul class="workouts">
@@ -166,6 +166,16 @@
       <main class="main">
         <!-- A div element with map as className -->
         <div id="map" class="map__container"></div>
+
+        <!-- Modal for when form inputs are invalid -->
+        <div id="modal" class="modal [ hidden ]">
+          <div class="modal__content [ flex-col ]">
+            <span class="modal__close">&times;</span>
+            <p class="modal__message">
+              Except for elevation: all inputs must be positive numbers!
+            </p>
+          </div>
+        </div>
       </main>
     </div>
   </body>
