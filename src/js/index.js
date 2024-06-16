@@ -65,8 +65,10 @@ const app = function () {
   // We need to create a function to render map
 
   const renderMap = function (coords) {
+    const workoutZoomLevel = 13;
+
     // L is a global namespace that leaflet provides
-    map = L.map('map').setView(coords, 13);
+    map = L.map('map').setView(coords, workoutZoomLevel);
 
     L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
       attribution:
@@ -128,12 +130,71 @@ const app = function () {
     formEl.classList.remove('visually-hide');
   };
 
+  const renderWorkout = function (workout) {
+    const workoutList = document.querySelector('.workouts');
+
+    let html = `
+    
+    <li class="workout workout--${workout.type} [ grid-workout ]" data-id=${workout.id} >
+    <h2 class="workout__title">${workout.description}</h2>
+    <div class="workout__details">
+      <span class="workout__icon">${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♂️'}</span>
+      <span class="workout__value">${workout.distance}</span>
+      <span class="workout__unit">km</span>
+    </div>
+    <div class="workout__details">
+      <span class="workout__icon">🕑</span>
+      <span class="workout__value">${workout.duration}</span>
+      <span class="workout__unit">min</span>
+    </div>
+    
+    `;
+
+    if (workout.type === 'running') {
+      html += `
+      
+
+      <div class="workout__details">
+              <span class="workout__icon">⚡</span>
+              <span class="workout__value">${workout.pace.toFixed(1)}</span>
+              <span class="workout__unit">min/km</span>
+            </div>
+            <div class="workout__details">
+              <span class="workout__icon">🦶</span>
+              <span class="workout__value">${workout.cadence}</span>
+              <span class="workout__unit">spm</span>
+            </div>
+      
+      `;
+    }
+
+    if (workout.type === 'cycling') {
+      html += `
+        
+        <div class="workout__details">
+        <span class="workout__icon">⚡</span>
+        <span class="workout__value">${workout.speed}</span>
+        <span class="workout__unit">min/km</span>
+      </div>
+      <div class="workout__details">
+        <span class="workout__icon">🗻</span>
+        <span class="workout__value">${workout.elevationGain}</span>
+        <span class="workout__unit">m</span>
+      </div>
+
+      `;
+    }
+
+    workoutList.insertAdjacentHTML('beforeend', html);
+  };
+
   return {
     getGeoCoords,
     renderMap,
     mapOnClick,
     mapMarker,
     showForm,
+    renderWorkout,
   };
 };
 
@@ -245,19 +306,49 @@ const createWorkoutObject = function (
     distance,
     duration,
     date,
+    id: '',
     description: '',
+    pace: '',
+    speed: '',
+    elevationGain: '',
     setDescription() {
       this.description = `${this.type.charAt(0).toUpperCase()}${this.type.slice(1)} on ${this.date.getDate()} ${months[this.date.getMonth()]} ${this.date.getFullYear()}`;
+    },
+    calcPace() {
+      this.pace = this.duration / this.distance;
+      return this.pace;
+    },
+    calcSpeed() {
+      this.speed = this.distance / (this.duration / 60);
+      return this.speed;
+    },
+    calcElevationGain() {
+      this.elevationGain = this.elevation;
+      return this.elevationGain;
+    },
+    createId() {
+      this.id = this.date
+        .toISOString()
+        .slice(-13, -1)
+        .split(':')
+        .join('')
+        .split('.')
+        .join('');
+      return this.id;
     },
   };
 
   if (type === 'running') {
     workout.setDescription();
+    workout.calcPace();
+    workout.createId();
     workout = { ...workout, cadence };
   }
 
   if (type === 'cycling') {
     workout.setDescription();
+    workout.calcSpeed();
+    workout.createId();
     workout = { ...workout, elevation };
   }
 
@@ -328,6 +419,7 @@ const handleFormSubmit = function (event, newCoords, appInstance) {
     const coords = newCoords;
 
     appInstance.mapMarker(coords, newWorkout);
+    appInstance.renderWorkout(newWorkout);
 
     formEl.classList.add('visually-hide');
 
