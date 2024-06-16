@@ -3,13 +3,13 @@
 /* Popup width is defined in JS using options */
 .leaflet-popup .leaflet-popup-content-wrapper {
   background-color: variables.$color-dark-1;
-  color: variables.$color-dark-2;
+  color: variables.$color-text-light-2;
   border-radius: 5px;
   padding-right: 0.6rem;
 }
 
 .leaflet-popup .leaflet-popup-content {
-  font-size: 1.5rem;
+  font-size: variables.$font-size-lg;
 }
 
 .leaflet-popup .leaflet-popup-tip {
@@ -17,9 +17,9 @@
 }
 
 .running-popup .leaflet-popup-content-wrapper {
-  border-left: 5px solid variables.$color-dark-1;
+  border-left: 5px solid variables.$color-brand-1;
 }
 
 .cycling-popup .leaflet-popup-content-wrapper {
-  border-left: 5px solid variables.$color-primary;
+  border-left: 5px solid variables.$color-brand-2;
 }
