@@ -106,7 +106,7 @@ const app = function () {
 
   // Lets create a mapMarker function here
 
-  const mapMarker = function (coords) {
+  const mapMarker = function (coords, workout) {
     // const { lat, lng } = coords;
 
     L.marker(coords)
@@ -117,10 +117,10 @@ const app = function () {
           minWidth: 100,
           autoClose: false,
           closeOnClick: false,
-          className: 'running-popup',
+          className: `${workout.type}-popup`,
         })
       )
-      .setPopupContent('Workout')
+      .setPopupContent(workout.description)
       .openPopup();
   };
 
@@ -217,6 +217,77 @@ const showModal = function (errorMsg) {
   };
 };
 
+const createWorkoutObject = function (
+  type,
+  distance,
+  duration,
+  cadence,
+  elevation,
+  date
+) {
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
+  let workout = {
+    type,
+    distance,
+    duration,
+    date,
+    description: '',
+    setDescription() {
+      this.description = `${this.type.charAt(0).toUpperCase()}${this.type.slice(1)} on ${this.date.getDate()} ${months[this.date.getMonth()]} ${this.date.getFullYear()}`;
+    },
+  };
+
+  if (type === 'running') {
+    workout.setDescription();
+    workout = { ...workout, cadence };
+  }
+
+  if (type === 'cycling') {
+    workout.setDescription();
+    workout = { ...workout, elevation };
+  }
+
+  return workout;
+};
+
+const createNewWorkout = function () {
+  let workouts = [];
+
+  const addWorkout = (workout) => {
+    workouts = [...workouts, workout];
+  };
+
+  const saveToLocalStorage = () => {
+    localStorage.setItem('workouts', JSON.stringify(workouts));
+  };
+
+  const getWorkouts = () => workouts;
+
+  return {
+    addWorkout,
+    saveToLocalStorage,
+    getWorkouts,
+  };
+};
+
+// Creating a closure here
+
+const workoutManager = createNewWorkout();
+
 const handleFormSubmit = function (event, newCoords, appInstance) {
   event.preventDefault();
 
@@ -236,9 +307,27 @@ const handleFormSubmit = function (event, newCoords, appInstance) {
       handleInputs(type, distance, duration, elevation);
     }
 
+    // Create a date for the new workout
+
+    const date = new Date();
+
+    const newWorkout = createWorkoutObject(
+      type,
+      distance,
+      duration,
+      cadence,
+      elevation,
+      date
+    );
+
+    console.log(newWorkout);
+
+    workoutManager.addWorkout(newWorkout);
+    workoutManager.saveToLocalStorage();
+
     const coords = newCoords;
 
-    appInstance.mapMarker(coords);
+    appInstance.mapMarker(coords, newWorkout);
 
     formEl.classList.add('visually-hide');
 
