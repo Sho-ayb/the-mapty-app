@@ -20,20 +20,20 @@ import '../assets/img/logo.png';
 // Globals for form inputs
 
 const formEl = document.querySelector('.form');
+const workoutEl = document.querySelector('.workouts');
 const typeSelection = document.querySelector('.form__input--type');
 const distanceInput = document.querySelector('.form__input--distance');
 const durationInput = document.querySelector('.form__input--duration');
 const cadenceInput = document.querySelector('.form__input--cadence');
 const elevationGainInput = document.querySelector('.form__input--elevation');
 
-// We need to create global variables for map and mapEvent
-
-let map;
-let mapEvent;
-
 // Lets create a factory function here
 
 const app = function () {
+  // private variables
+  let map;
+  let mapEvent;
+  const workoutZoomLevel = 13;
   // we need to the coords lat/lng from the users location
   const getGeoCoords = async function () {
     // if success
@@ -59,14 +59,12 @@ const app = function () {
       return success(position);
     }
 
-    throw new Error('Geolocation is not supported by this browser.');
+    return error('Geolocation is not supported by this browser.');
   };
 
   // We need to create a function to render map
 
   const renderMap = function (coords) {
-    const workoutZoomLevel = 13;
-
     // L is a global namespace that leaflet provides
     map = L.map('map').setView(coords, workoutZoomLevel);
 
@@ -83,8 +81,6 @@ const app = function () {
       const { lat, lng } = latlng;
 
       const newCoords = [lat, lng];
-
-      console.log(newCoords);
 
       if (newCoords) {
         callback(newCoords);
@@ -188,6 +184,17 @@ const app = function () {
     workoutList.insertAdjacentHTML('beforeend', html);
   };
 
+  const moveToPopup = function (id, workouts) {
+    const workout = workouts.find((work) => work.id === id);
+
+    map.setView(workout.coords, workoutZoomLevel, {
+      animate: true,
+      pan: {
+        duration: 1,
+      },
+    });
+  };
+
   return {
     getGeoCoords,
     renderMap,
@@ -195,6 +202,7 @@ const app = function () {
     mapMarker,
     showForm,
     renderWorkout,
+    moveToPopup,
   };
 };
 
@@ -284,7 +292,8 @@ const createWorkoutObject = function (
   duration,
   cadence,
   elevation,
-  date
+  date,
+  coords
 ) {
   const months = [
     'January',
@@ -306,6 +315,7 @@ const createWorkoutObject = function (
     distance,
     duration,
     date,
+    coords,
     id: '',
     description: '',
     pace: '',
@@ -409,7 +419,8 @@ const handleFormSubmit = function (event, newCoords, appInstance) {
       duration,
       cadence,
       elevation,
-      date
+      date,
+      newCoords
     );
 
     console.log(newWorkout);
@@ -435,6 +446,19 @@ const handleFormSubmitListener = function (event, newCoords, appInstance) {
   handleFormSubmit(event, newCoords, appInstance);
 };
 
+const workoutListener = function (event, appInstance) {
+  const workout = event.target.closest('.workout');
+
+  // gaurd clause
+  if (!workout) return;
+
+  const workoutId = workout.dataset.id;
+
+  const allWorkouts = workoutManager.getWorkouts();
+
+  appInstance.moveToPopup(workoutId, allWorkouts);
+};
+
 const init = async () => {
   const appInstance = app();
   const coords = await appInstance.getGeoCoords();
@@ -443,6 +467,7 @@ const init = async () => {
     // show the form when the user clicks on the map
 
     appInstance.showForm();
+    // listens to the form input type and changes the workout type
     handleTypeChange();
 
     //  the option once:true ensures that the event listener is immediately removed once added
@@ -450,6 +475,12 @@ const init = async () => {
       'submit',
       (event) => handleFormSubmitListener(event, newCoords, appInstance),
       { once: true }
+    );
+
+    // Listening to the workout list element; when user clicks a workout in the list, map will be repositioned to the map marker
+
+    workoutEl.addEventListener('click', (event) =>
+      workoutListener(event, appInstance)
     );
   });
 };
