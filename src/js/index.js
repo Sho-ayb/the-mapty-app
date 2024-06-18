@@ -323,7 +323,7 @@ const createWorkoutObject = function (
       return this.speed;
     },
     calcElevationGain() {
-      this.elevationGain = this.elevation;
+      this.elevationGain = elevation;
       return this.elevationGain;
     },
     createId() {
@@ -339,16 +339,17 @@ const createWorkoutObject = function (
   };
 
   if (type === 'running') {
+    workout.createId();
     workout.setDescription();
     workout.calcPace();
-    workout.createId();
     workout = { ...workout, cadence };
   }
 
   if (type === 'cycling') {
+    workout.createId();
     workout.setDescription();
     workout.calcSpeed();
-    workout.createId();
+    workout.calcElevationGain();
     workout = { ...workout, elevation };
   }
 
