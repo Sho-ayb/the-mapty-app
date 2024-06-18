@@ -64,6 +64,7 @@ body .workout {
   padding: variables.$spacing-lg;
   background-color: variables.$color-background-dark-2;
   border-radius: 6px;
+  cursor: pointer;
 
   &__details {
     font-size: 0.875rem;
