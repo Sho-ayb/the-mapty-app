@@ -50,16 +50,22 @@ const app = function () {
       throw new Error(`ERROR(${err.code}: ${err.message})`);
     };
 
-    // navigator.geolocation should be supported by the browser
-    if (navigator.geolocation) {
-      const position = await new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject);
-      });
+    //  returning a promise object to the function
+    return new Promise((resolve, reject) => {
+      // navigator.geolocation should be supported by the browser
+      if (navigator.geolocation) {
+        // this api has a getCurrentPosition method that takes in two arguments: a success and error
 
-      return success(position);
-    }
-
-    return error('Geolocation is not supported by this browser.');
+        navigator.geolocation.getCurrentPosition(
+          (position) => resolve(success(position)),
+          (err) => {
+            reject(error(err));
+          }
+        );
+      } else {
+        reject(error('Geolocation is not supported by your browser.'));
+      }
+    });
   };
 
   // We need to create a function to render map
@@ -377,11 +383,20 @@ const createNewWorkout = function () {
     localStorage.setItem('workouts', JSON.stringify(workouts));
   };
 
+  const getFromLocalStorage = () => {
+    const data = JSON.parse(localStorage.getItem('workouts'));
+
+    if (!data) return;
+
+    workouts = data;
+  };
+
   const getWorkouts = () => workouts;
 
   return {
     addWorkout,
     saveToLocalStorage,
+    getFromLocalStorage,
     getWorkouts,
   };
 };
@@ -460,29 +475,50 @@ const workoutListener = function (event, appInstance) {
 };
 
 const init = async () => {
+  // Creating an instance of the app function that returns an object with all the methods and properties
   const appInstance = app();
-  const coords = await appInstance.getGeoCoords();
-  appInstance.renderMap(coords);
-  appInstance.mapOnClick((newCoords) => {
-    // show the form when the user clicks on the map
 
-    appInstance.showForm();
-    // listens to the form input type and changes the workout type
-    handleTypeChange();
+  // Lets wrap the rest of the code within a try catch block, to await the Promise object to either resolve or reject
 
-    //  the option once:true ensures that the event listener is immediately removed once added
-    formEl.addEventListener(
-      'submit',
-      (event) => handleFormSubmitListener(event, newCoords, appInstance),
-      { once: true }
-    );
+  try {
+    const coords = await appInstance.getGeoCoords();
+    appInstance.renderMap(coords);
 
-    // Listening to the workout list element; when user clicks a workout in the list, map will be repositioned to the map marker
+    // Workouts in localStorage will be retrieved and rendered again on the map, when the browser is reloaded. This needs to be done after the map is rendered and before the mapOnClick function is called.
 
-    workoutEl.addEventListener('click', (event) =>
-      workoutListener(event, appInstance)
-    );
-  });
+    workoutManager.getFromLocalStorage();
+
+    const storedWorkouts = workoutManager.getWorkouts();
+
+    storedWorkouts.forEach((workout) => {
+      appInstance.renderWorkout(workout);
+      appInstance.mapMarker(workout.coords, workout);
+    });
+
+    // Listening to the map element; when the user clicks on the map, the form will be shown: this is a callback function, whene triggered the newCoords will be passed as an argument to the mapOnClick function
+    appInstance.mapOnClick((newCoords) => {
+      // show the form when the user clicks on the map
+
+      appInstance.showForm();
+      // listens to the form input type and changes the workout type
+      handleTypeChange();
+
+      //  the option once:true ensures that the event listener is immediately removed once added
+      formEl.addEventListener(
+        'submit',
+        (event) => handleFormSubmitListener(event, newCoords, appInstance),
+        { once: true }
+      );
+
+      // Listening to the workout list element; when user clicks a workout in the list, map will be repositioned to the map marker
+
+      workoutEl.addEventListener('click', (event) =>
+        workoutListener(event, appInstance)
+      );
+    });
+  } catch (error) {
+    showModal(error.message);
+  }
 };
 
 init();
