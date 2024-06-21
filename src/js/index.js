@@ -29,11 +29,12 @@ const elevationGainInput = document.querySelector('.form__input--elevation');
 
 // Lets create a factory function here
 
-const app = function () {
+const app = function (handleTrashbinListener) {
   // private variables
   let map;
   let mapEvent;
   const workoutZoomLevel = 13;
+  const markers = new Map();
   // we need to the coords lat/lng from the users location
   const getGeoCoords = async function () {
     // if success
@@ -111,8 +112,6 @@ const app = function () {
   // Lets create a mapMarker function here
 
   const mapMarker = function (coords, workout) {
-    // const { lat, lng } = coords;
-
     L.marker(coords)
       .addTo(map)
       .bindPopup(
@@ -126,6 +125,19 @@ const app = function () {
       )
       .setPopupContent(workout.description)
       .openPopup();
+
+    // markers.set(workout.id, marker);
+
+    // return marker;
+  };
+
+  const removeMapMarker = (workoutId) => {
+    const marker = markers.get(workoutId);
+
+    if (marker) {
+      map.removeLayer(marker);
+      markers.delete(workoutId);
+    }
   };
 
   const showForm = function () {
@@ -136,8 +148,10 @@ const app = function () {
     const workoutList = document.querySelector('.workouts');
 
     let html = `
-    
     <li class="workout workout--${workout.type} [ grid-workout ]" data-id=${workout.id}>
+    <div class="workout__trash">
+    <i class='bx bx-trash'></i>
+    </div>
     <h2 class="workout__title">${workout.description}</h2>
     <div class="workout__details">
       <span class="workout__icon">${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♂️'}</span>
@@ -188,6 +202,8 @@ const app = function () {
     }
 
     workoutList.insertAdjacentHTML('beforeend', html);
+
+    handleTrashbinListener(mapMarker);
   };
 
   const moveToPopup = function (id, workouts) {
@@ -206,6 +222,7 @@ const app = function () {
     renderMap,
     mapOnClick,
     mapMarker,
+    removeMapMarker,
     showForm,
     renderWorkout,
     moveToPopup,
@@ -384,11 +401,31 @@ const createNewWorkout = function () {
   };
 
   const getFromLocalStorage = () => {
-    const data = JSON.parse(localStorage.getItem('workouts'));
+    const data = JSON.parse(localStorage.getItem('workouts')) || [];
 
     if (!data) return;
 
     workouts = data;
+  };
+
+  const deleteFromLocalStorage = (event) => {
+    const workout = event.target.closest('.workout');
+
+    const workoutId = workout.dataset.id;
+
+    const updatedWorkouts = workouts.filter((work) => work.id !== workoutId);
+
+    console.log(updatedWorkouts);
+
+    workouts = updatedWorkouts;
+
+    saveToLocalStorage();
+  };
+
+  const removeWorkoutFromDom = (event) => {
+    const workout = event.target.closest('.workout');
+
+    workout.remove();
   };
 
   const getWorkouts = () => workouts;
@@ -397,6 +434,8 @@ const createNewWorkout = function () {
     addWorkout,
     saveToLocalStorage,
     getFromLocalStorage,
+    deleteFromLocalStorage,
+    removeWorkoutFromDom,
     getWorkouts,
   };
 };
@@ -445,8 +484,8 @@ const handleFormSubmit = function (event, newCoords, appInstance) {
 
     const coords = newCoords;
 
-    appInstance.mapMarker(coords, newWorkout);
     appInstance.renderWorkout(newWorkout);
+    appInstance.mapMarker(coords, newWorkout);
 
     formEl.classList.add('visually-hide');
 
@@ -459,6 +498,26 @@ const handleFormSubmit = function (event, newCoords, appInstance) {
 
 const handleFormSubmitListener = function (event, newCoords, appInstance) {
   handleFormSubmit(event, newCoords, appInstance);
+};
+
+const handleTrashbinListener = (mapMarker) => {
+  const trashbinEl = document.querySelectorAll(
+    '.workout__trash > i.bx.bx-trash'
+  );
+
+  console.log(trashbinEl);
+
+  if (trashbinEl) {
+    trashbinEl.forEach((el) => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation(); // prevents the event from bubbling up to the parent element
+        console.log('clicked trashcan');
+        console.log(el.closest('.workout'));
+        workoutManager.deleteFromLocalStorage(e);
+        workoutManager.removeWorkoutFromDom(e);
+      });
+    });
+  }
 };
 
 const workoutListener = function (event, appInstance) {
@@ -476,24 +535,16 @@ const workoutListener = function (event, appInstance) {
 
 const init = async () => {
   // Creating an instance of the app function that returns an object with all the methods and properties
-  const appInstance = app();
+  const appInstance = app(handleTrashbinListener);
 
   // Lets wrap the rest of the code within a try catch block, to await the Promise object to either resolve or reject
 
   try {
     const coords = await appInstance.getGeoCoords();
     appInstance.renderMap(coords);
+    // const allMarkers = appInstance.mapMarker();
 
-    // Workouts in localStorage will be retrieved and rendered again on the map, when the browser is reloaded. This needs to be done after the map is rendered and before the mapOnClick function is called.
-
-    workoutManager.getFromLocalStorage();
-
-    const storedWorkouts = workoutManager.getWorkouts();
-
-    storedWorkouts.forEach((workout) => {
-      appInstance.renderWorkout(workout);
-      appInstance.mapMarker(workout.coords, workout);
-    });
+    // console.log(allMarkers);
 
     // Listening to the map element; when the user clicks on the map, the form will be shown: this is a callback function, whene triggered the newCoords will be passed as an argument to the mapOnClick function
     appInstance.mapOnClick((newCoords) => {
@@ -516,6 +567,19 @@ const init = async () => {
         workoutListener(event, appInstance)
       );
     });
+
+    // Workouts in localStorage will be retrieved and rendered again on the map, when the browser is reloaded. This needs to be done after the map is rendered and before the mapOnClick function is called.
+
+    workoutManager.getFromLocalStorage();
+
+    const storedWorkouts = workoutManager.getWorkouts();
+
+    if (storedWorkouts.length > 0) {
+      storedWorkouts.forEach((workout) => {
+        appInstance.renderWorkout(workout);
+        appInstance.mapMarker(workout.coords, workout);
+      });
+    }
   } catch (error) {
     showModal(error.message);
   }

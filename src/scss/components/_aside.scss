@@ -61,10 +61,15 @@ body .workouts {
 
 body .workout {
   margin-bottom: variables.$spacing-lg;
-  padding: variables.$spacing-md;
+  padding: variables.$spacing-sm;
   background-color: variables.$color-background-dark-2;
   border-radius: 6px;
   cursor: pointer;
+
+  &__trash {
+    text-align: right;
+    font-size: variables.$font-size-2xl;
+  }
 
   &__details {
     font-size: 0.875rem;
