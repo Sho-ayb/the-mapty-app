@@ -112,23 +112,33 @@ const app = function (handleTrashbinListener) {
   // Lets create a mapMarker function here
 
   const mapMarker = function (coords, workout) {
-    L.marker(coords)
-      .addTo(map)
-      .bindPopup(
-        L.popup({
-          maxWidth: 300,
-          minWidth: 100,
-          autoClose: false,
-          closeOnClick: false,
-          className: `${workout.type}-popup`,
-        })
-      )
-      .setPopupContent(workout.description)
-      .openPopup();
+    if (!map) {
+      throw new Error('Map not initialized');
+    }
 
-    // markers.set(workout.id, marker);
+    try {
+      const marker = L.marker(coords);
+      marker.addTo(map);
 
-    // return marker;
+      const popup = L.popup({
+        maxWidth: 300,
+        minWidth: 100,
+        autoClose: false,
+        closeOnClick: false,
+        className: `${workout.type}-popup`,
+      });
+
+      marker.bindPopup(popup);
+      marker.setPopupContent(workout.description);
+      marker.openPopup();
+
+      // A weakmap has been initialised as private variable
+      markers.set(workout.id, marker);
+
+      return marker;
+    } catch (err) {
+      throw new Error(`ERROR(${err.code}: ${err.message})`);
+    }
   };
 
   const removeMapMarker = (workoutId) => {
@@ -203,7 +213,8 @@ const app = function (handleTrashbinListener) {
 
     workoutList.insertAdjacentHTML('beforeend', html);
 
-    handleTrashbinListener(mapMarker);
+    // The callback function passed to this function will be executed when a workout is rendered
+    handleTrashbinListener(removeMapMarker);
   };
 
   const moveToPopup = function (id, workouts) {
@@ -408,23 +419,17 @@ const createNewWorkout = function () {
     workouts = data;
   };
 
-  const deleteFromLocalStorage = (event) => {
-    const workout = event.target.closest('.workout');
-
+  const deleteFromLocalStorage = (workout) => {
     const workoutId = workout.dataset.id;
 
     const updatedWorkouts = workouts.filter((work) => work.id !== workoutId);
-
-    console.log(updatedWorkouts);
 
     workouts = updatedWorkouts;
 
     saveToLocalStorage();
   };
 
-  const removeWorkoutFromDom = (event) => {
-    const workout = event.target.closest('.workout');
-
+  const removeWorkoutFromDom = (workout) => {
     workout.remove();
   };
 
@@ -500,7 +505,7 @@ const handleFormSubmitListener = function (event, newCoords, appInstance) {
   handleFormSubmit(event, newCoords, appInstance);
 };
 
-const handleTrashbinListener = (mapMarker) => {
+const handleTrashbinListener = (removeMapMarker) => {
   const trashbinEl = document.querySelectorAll(
     '.workout__trash > i.bx.bx-trash'
   );
@@ -511,10 +516,12 @@ const handleTrashbinListener = (mapMarker) => {
     trashbinEl.forEach((el) => {
       el.addEventListener('click', (e) => {
         e.stopPropagation(); // prevents the event from bubbling up to the parent element
-        console.log('clicked trashcan');
         console.log(el.closest('.workout'));
-        workoutManager.deleteFromLocalStorage(e);
-        workoutManager.removeWorkoutFromDom(e);
+        const workout = el.closest('.workout');
+        const workoutId = workout.dataset.id;
+        workoutManager.deleteFromLocalStorage(workout);
+        workoutManager.removeWorkoutFromDom(workout);
+        removeMapMarker(workoutId);
       });
     });
   }
@@ -535,16 +542,16 @@ const workoutListener = function (event, appInstance) {
 
 const init = async () => {
   // Creating an instance of the app function that returns an object with all the methods and properties
-  const appInstance = app(handleTrashbinListener);
+  const appInstance = app((removeMapMarker) => {
+    // a callback function here to pass in the removeMapMarker function to handleTrashbinListener function
+    handleTrashbinListener(removeMapMarker);
+  });
 
   // Lets wrap the rest of the code within a try catch block, to await the Promise object to either resolve or reject
 
   try {
     const coords = await appInstance.getGeoCoords();
     appInstance.renderMap(coords);
-    // const allMarkers = appInstance.mapMarker();
-
-    // console.log(allMarkers);
 
     // Listening to the map element; when the user clicks on the map, the form will be shown: this is a callback function, whene triggered the newCoords will be passed as an argument to the mapOnClick function
     appInstance.mapOnClick((newCoords) => {
