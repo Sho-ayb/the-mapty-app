@@ -33,101 +33,106 @@
     <div class="grid__wrapper [ grid-container ]">
       <aside class="aside [ flex-center flex-col ]">
         <img src="assets/img/logo.png" alt="logo" class="logo [ flex-start ]" />
-        <form class="form [ visually-hide ] [ grid-form ]">
-          <div class="form__row [ grid-form-row ]">
-            <label for="type" class="form__label">Type</label>
-            <select name="type" class="form__input form__input--type">
-              <option value="running">Running</option>
-              <option value="cycling">Cycling</option>
-            </select>
-          </div>
-          <div class="form__row [ grid-form-row ]">
-            <label for="distance" class="form__label">Distance</label>
-            <input
-              name="distance"
-              type="text"
-              class="form__input form__input--distance"
-              placeholder="km"
-            />
-          </div>
-          <div class="form__row [ grid-form-row ]">
-            <label for="duration" class="form__label">Duration</label>
-            <input
-              name="duration"
-              type="text"
-              class="form__input form__input--duration"
-              placeholder="min"
-            />
-          </div>
-          <div class="form__row [ grid-form-row ]">
-            <label for="cadence" class="form__label">Cadence</label>
-            <input
-              name="cadence"
-              type="text"
-              class="form__input form__input--cadence"
-              placeholder="step/min"
-            />
-          </div>
-          <div class="form__row [ hidden ] [ grid-form-row ]">
-            <label for="elev-gain" class="form__label">Elev Gain</label>
-            <input
-              name="elev-gain"
-              type="text"
-              class="form__input form__input--elevation"
-              placeholder="meters"
-            />
-          </div>
-          <button class="form__btn [ hidden ]">OK</button>
-        </form>
 
-        <ul class="workouts [ flex-grow ]">
-          <!-- <li class="workout workout--running [ grid-workout ]">
-            <h2 class="workout__title">Running on 23 May 2024</h2>
-            <div class="workout__details">
-              <span class="workout__icon">🏃‍♂️</span>
-              <span class="workout__value">5.3</span>
-              <span class="workout__unit">km</span>
+        <div class="form__container">
+          <form class="form [ grid-form ] [ visually-hide ]">
+            <div class="form__row [ grid-form-row ]">
+              <label for="type" class="form__label">Type</label>
+              <select name="type" class="form__input form__input--type">
+                <option value="running">Running</option>
+                <option value="cycling">Cycling</option>
+              </select>
             </div>
-            <div class="workout__details">
-              <span class="workout__icon">🕑</span>
-              <span class="workout__value">14</span>
-              <span class="workout__unit">min</span>
+            <div class="form__row [ grid-form-row ]">
+              <label for="distance" class="form__label">Distance</label>
+              <input
+                name="distance"
+                type="text"
+                class="form__input form__input--distance"
+                placeholder="km"
+              />
             </div>
-            <div class="workout__details">
-              <span class="workout__icon">⚡</span>
-              <span class="workout__value">4.6</span>
-              <span class="workout__unit">min/km</span>
+            <div class="form__row [ grid-form-row ]">
+              <label for="duration" class="form__label">Duration</label>
+              <input
+                name="duration"
+                type="text"
+                class="form__input form__input--duration"
+                placeholder="min"
+              />
             </div>
-            <div class="workout__details">
-              <span class="workout__icon">🦶</span>
-              <span class="workout__value">22</span>
-              <span class="workout__unit">spm</span>
+            <div class="form__row [ grid-form-row ]">
+              <label for="cadence" class="form__label">Cadence</label>
+              <input
+                name="cadence"
+                type="text"
+                class="form__input form__input--cadence"
+                placeholder="step/min"
+              />
             </div>
-          </li>
-          <li class="workout workout--cycling [ grid-workout ]">
-            <h2 class="workout__title">Cycling on 23 May 2024</h2>
-            <div class="workout__details">
-              <span class="workout__icon">🚴</span>
-              <span class="workout__value">27</span>
-              <span class="workout__unit">km</span>
+            <div class="form__row [ hidden ] [ grid-form-row ]">
+              <label for="elev-gain" class="form__label">Elev Gain</label>
+              <input
+                name="elev-gain"
+                type="text"
+                class="form__input form__input--elevation"
+                placeholder="meters"
+              />
             </div>
-            <div class="workout__details">
-              <span class="workout__icon">🕑</span>
-              <span class="workout__value">95</span>
-              <span class="workout__unit">min</span>
-            </div>
-            <div class="workout__details">
-              <span class="workout__icon">⚡</span>
-              <span class="workout__value">16</span>
-              <span class="workout__unit">min/km</span>
-            </div>
-            <div class="workout__details">
-              <span class="workout__icon">🗻</span>
-              <span class="workout__value">223</span>
-              <span class="workout__unit">m</span>
-            </div>
-          </li> -->
-        </ul>
+            <button class="form__btn [ hidden ]">OK</button>
+          </form>
+        </div>
+
+        <div class="workouts__container [ flex-grow ]">
+          <ul class="workouts">
+            <!-- <li class="workout workout--running [ grid-workout ]">
+              <h2 class="workout__title">Running on 23 May 2024</h2>
+              <div class="workout__details">
+                <span class="workout__icon">🏃‍♂️</span>
+                <span class="workout__value">5.3</span>
+                <span class="workout__unit">km</span>
+              </div>
+              <div class="workout__details">
+                <span class="workout__icon">🕑</span>
+                <span class="workout__value">14</span>
+                <span class="workout__unit">min</span>
+              </div>
+              <div class="workout__details">
+                <span class="workout__icon">⚡</span>
+                <span class="workout__value">4.6</span>
+                <span class="workout__unit">min/km</span>
+              </div>
+              <div class="workout__details">
+                <span class="workout__icon">🦶</span>
+                <span class="workout__value">22</span>
+                <span class="workout__unit">spm</span>
+              </div>
+            </li>
+            <li class="workout workout--cycling [ grid-workout ]">
+              <h2 class="workout__title">Cycling on 23 May 2024</h2>
+              <div class="workout__details">
+                <span class="workout__icon">🚴</span>
+                <span class="workout__value">27</span>
+                <span class="workout__unit">km</span>
+              </div>
+              <div class="workout__details">
+                <span class="workout__icon">🕑</span>
+                <span class="workout__value">95</span>
+                <span class="workout__unit">min</span>
+              </div>
+              <div class="workout__details">
+                <span class="workout__icon">⚡</span>
+                <span class="workout__value">16</span>
+                <span class="workout__unit">min/km</span>
+              </div>
+              <div class="workout__details">
+                <span class="workout__icon">🗻</span>
+                <span class="workout__value">223</span>
+                <span class="workout__unit">m</span>
+              </div>
+            </li> -->
+          </ul>
+        </div>
 
         <div class="aside__footer [ flex-center flex-col ]">
           <p class="my__details [ mg-auto-80 ]">

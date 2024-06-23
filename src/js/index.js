@@ -19,7 +19,9 @@ import '../assets/img/logo.png';
 
 // Globals for form inputs
 
+const formContainer = document.querySelector('.form__container');
 const formEl = document.querySelector('.form');
+const workoutsContainer = document.querySelector('.workouts__container');
 const workoutEl = document.querySelector('.workouts');
 const typeSelection = document.querySelector('.form__input--type');
 const distanceInput = document.querySelector('.form__input--distance');
@@ -151,7 +153,17 @@ const app = function (handleTrashbinListener) {
   };
 
   const showForm = function () {
+    formContainer.classList.remove('form__hide');
+    formEl.classList.add('active');
     formEl.classList.remove('visually-hide');
+    workoutsContainer.classList.add('form__not-hidden');
+  };
+
+  const hideForm = function () {
+    formContainer.classList.remove('form__hide');
+    formEl.classList.remove('active');
+    formEl.classList.add('visually-hide');
+    workoutsContainer.classList.remove('form__not-hidden');
   };
 
   const renderWorkout = function (workout) {
@@ -235,6 +247,7 @@ const app = function (handleTrashbinListener) {
     mapMarker,
     removeMapMarker,
     showForm,
+    hideForm,
     renderWorkout,
     moveToPopup,
   };
@@ -492,7 +505,7 @@ const handleFormSubmit = function (event, newCoords, appInstance) {
     appInstance.renderWorkout(newWorkout);
     appInstance.mapMarker(coords, newWorkout);
 
-    formEl.classList.add('visually-hide');
+    appInstance.hideForm();
 
     clearInputs(distanceInput, durationInput, cadenceInput, elevationGainInput);
   } catch (error) {
