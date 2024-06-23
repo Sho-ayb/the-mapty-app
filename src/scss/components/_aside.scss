@@ -1,6 +1,7 @@
 @use "../base/variables" as variables;
 
 body .grid__wrapper .aside {
+  position: relative;
   height: 100vh;
   overflow-x: hidden;
   background-color: variables.$color-background-dark-1;
@@ -31,15 +32,34 @@ body .grid__wrapper {
   min-height: 100vh;
 }
 
+body .form__container {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 15rem; // the initial height is 15rem
+  margin-bottom: variables.$spacing-lg;
+  z-index: 10;
+  transition: height 0.3s ease;
+  display: flex;
+  justify-content: center;
+
+  &.form__hide {
+    height: 0; // when hidden height is collapsed
+  }
+}
+
 body .form {
+  position: absolute;
   font-size: variables.$font-size-lg;
-  margin: 0 0 variables.$spacing-lg 0;
+
+  // margin: variables.$spacing-lg 0 variables.$spacing-lg 0;
   background-color: variables.$color-background-dark-2;
   padding: variables.$spacing-lg;
   border-radius: 6px;
   transition:
-    all 0.5s,
-    transform 1ms;
+    transform 0.3s ease,
+    opacity 0.3s ease;
 
   &__input {
     font-family: inherit;
@@ -53,18 +73,16 @@ body .form {
       background-color: variables.$color-text-light-2;
     }
   }
+
+  &.active .form {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
-body .workouts {
-  margin: 0 variables.$spacing-md variables.$spacing-lg variables.$spacing-md;
-  padding: 0 variables.$spacing-md;
-  font-size: clamp(0.5rem, 0.5rem + 1vw, 1.1rem);
+body .workouts__container {
   overflow-y: auto;
-
-  @media (width >= 78.125rem) {
-    margin: 0 0 variables.$spacing-lg 0;
-  }
-
+  margin-top: 0; // giving it the same height as the form container
   // Styling the scrollbar
 
   // Webkit browsers (Chrome, Safari, newer versions of Edge)
@@ -86,6 +104,21 @@ body .workouts {
   scrollbar-width: thin;
   scrollbar-color: variables.$color-background-dark-2
     variables.$color-background-dark-1;
+
+  &.form__not-hidden {
+    margin-top: 15rem;
+  }
+}
+
+body .workouts {
+  overflow-y: hidden;
+  margin: 0 variables.$spacing-md variables.$spacing-lg variables.$spacing-md;
+  padding: 0 variables.$spacing-md;
+  font-size: clamp(0.5rem, 0.5rem + 1vw, 1.1rem);
+
+  @media (width >= 78.125rem) {
+    margin: 0 0 variables.$spacing-lg 0;
+  }
 }
 
 body .workout {
