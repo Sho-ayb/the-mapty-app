@@ -1,6 +1,7 @@
 @use "../base/variables" as variables;
 
 body .grid__wrapper .aside {
+  height: 100vh;
   overflow-x: hidden;
   background-color: variables.$color-background-dark-1;
 
@@ -32,7 +33,7 @@ body .grid__wrapper {
 
 body .form {
   font-size: variables.$font-size-lg;
-  margin-bottom: variables.$spacing-lg;
+  margin: 0 0 variables.$spacing-lg 0;
   background-color: variables.$color-background-dark-2;
   padding: variables.$spacing-lg;
   border-radius: 6px;
@@ -56,7 +57,35 @@ body .form {
 
 body .workouts {
   margin: 0 variables.$spacing-md variables.$spacing-lg variables.$spacing-md;
+  padding: 0 variables.$spacing-md;
   font-size: clamp(0.5rem, 0.5rem + 1vw, 1.1rem);
+  overflow-y: auto;
+
+  @media (width >= 78.125rem) {
+    margin: 0 0 variables.$spacing-lg 0;
+  }
+
+  // Styling the scrollbar
+
+  // Webkit browsers (Chrome, Safari, newer versions of Edge)
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: variables.$color-background-dark-1;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: variables.$color-background-dark-2;
+    border-radius: 6px;
+    border: 3px solid variables.$color-background-dark-1;
+  }
+
+  // Firefox
+  scrollbar-width: thin;
+  scrollbar-color: variables.$color-background-dark-2
+    variables.$color-background-dark-1;
 }
 
 body .workout {
