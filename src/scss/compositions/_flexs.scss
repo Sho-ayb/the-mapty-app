@@ -4,10 +4,14 @@
   align-items: center;
 
   @media (width >= 78.125rem) {
-    justify-content: space-evenly;
+    justify-content: space-between;
   }
 }
 
 .flex-col {
   flex-direction: column;
+}
+
+.flex-grow {
+  flex-grow: 1;
 }
