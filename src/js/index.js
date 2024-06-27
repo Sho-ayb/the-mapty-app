@@ -31,227 +31,226 @@ const elevationGainInput = document.querySelector('.form__input--elevation');
 
 // Lets create a factory function here
 
-const app = function (handleTrashbinListener) {
-  // private variables
-  let map;
-  let mapEvent;
-  const workoutZoomLevel = 13;
-  const markers = new Map();
-  // we need to the coords lat/lng from the users location
-  const getGeoCoords = async function () {
-    // if success
-    const success = (pos) => {
-      const { latitude: lat, longitude: lng } = pos.coords;
+// const app = function (handleTrashbinListener) {
+//   // private variables
+//   let map;
+//   let mapEvent;
+//   const workoutZoomLevel = 13;
+//   const markers = new Map();
+//   // we need to the coords lat/lng from the users location
+//   const getGeoCoords = async function () {
+//     // if success
+//     const success = (pos) => {
+//       const { latitude: lat, longitude: lng } = pos.coords;
 
-      const coords = [lat, lng];
+//       const coords = [lat, lng];
 
-      return coords;
-    };
+//       return coords;
+//     };
 
-    // if error
-    const error = (err) => {
-      throw new Error(`ERROR(${err.code}: ${err.message})`);
-    };
+//     // if error
+//     const error = (err) => {
+//       throw new Error(`ERROR(${err.code}: ${err.message})`);
+//     };
 
-    //  returning a promise object to the function
-    return new Promise((resolve, reject) => {
-      // navigator.geolocation should be supported by the browser
-      if (navigator.geolocation) {
-        // this api has a getCurrentPosition method that takes in two arguments: a success and error
+//     //  returning a promise object to the function
+//     return new Promise((resolve, reject) => {
+//       // navigator.geolocation should be supported by the browser
+//       if (navigator.geolocation) {
+//         // this api has a getCurrentPosition method that takes in two arguments: a success and error
 
-        navigator.geolocation.getCurrentPosition(
-          (position) => resolve(success(position)),
-          (err) => {
-            reject(error(err));
-          }
-        );
-      } else {
-        reject(error('Geolocation is not supported by your browser.'));
-      }
-    });
-  };
+//         navigator.geolocation.getCurrentPosition(
+//           (position) => resolve(success(position)),
+//           (err) => {
+//             reject(error(err));
+//           }
+//         );
+//       } else {
+//         reject(error('Geolocation is not supported by your browser.'));
+//       }
+//     });
+//   };
 
-  // We need to create a function to render map
+//   // We need to create a function to render map
 
-  const renderMap = function (coords) {
-    // L is a global namespace that leaflet provides
-    map = L.map('map').setView(coords, workoutZoomLevel);
+//   const renderMap = function (coords) {
+//     // L is a global namespace that leaflet provides
+//     map = L.map('map').setView(coords, workoutZoomLevel);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }).addTo(map);
-  };
+//     L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+//       attribution:
+//         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+//     }).addTo(map);
+//   };
 
-  //   User clicks on map
+//   //   User clicks on map
 
-  const mapOnClick = function (callback) {
-    const newGeoCoords = (latlng) => {
-      const { lat, lng } = latlng;
+//   const mapOnClick = function (callback) {
+//     const newGeoCoords = (latlng) => {
+//       const { lat, lng } = latlng;
 
-      const newCoords = [lat, lng];
+//       const newCoords = [lat, lng];
 
-      if (newCoords) {
-        callback(newCoords);
-      }
-    };
+//       if (newCoords) {
+//         callback(newCoords);
+//       }
+//     };
 
-    // The above renderMap function instantiates a map object in which there is event objects such as the listener function
+//     // The above renderMap function instantiates a map object in which there is event objects such as the listener function
 
-    map.on('click', (mapE) => {
-      // reassign to mapEvent
-      mapEvent = mapE;
+//     map.on('click', (mapE) => {
+//       // reassign to mapEvent
+//       mapEvent = mapE;
 
-      console.log(mapEvent);
+//       console.log(mapEvent);
 
-      //  invoke the function to pass in the latlng object
-      newGeoCoords(mapEvent.latlng);
-    });
-  };
+//       //  invoke the function to pass in the latlng object
+//       newGeoCoords(mapEvent.latlng);
+//     });
+//   };
 
-  //  The above function returns a newCoords array
+//   //  The above function returns a newCoords array
 
-  // Lets create a mapMarker function here
+//   // Lets create a mapMarker function here
 
-  const mapMarker = function (coords, workout) {
-    if (!map) {
-      throw new Error('Map not initialized');
-    }
+//   const mapMarker = function (coords, workout) {
+//     if (!map) {
+//       throw new Error('Map not initialized');
+//     }
 
-    try {
-      const marker = L.marker(coords);
-      marker.addTo(map);
+//     try {
+//       const marker = L.marker(coords);
+//       marker.addTo(map);
 
-      const popup = L.popup({
-        maxWidth: 300,
-        minWidth: 100,
-        autoClose: false,
-        closeOnClick: false,
-        className: `${workout.type}-popup`,
-      });
+//       const popup = L.popup({
+//         maxWidth: 300,
+//         minWidth: 100,
+//         autoClose: false,
+//         closeOnClick: false,
+//         className: `${workout.type}-popup`,
+//       });
 
-      marker.bindPopup(popup);
-      marker.setPopupContent(workout.description);
-      marker.openPopup();
+//       marker.bindPopup(popup);
+//       marker.setPopupContent(workout.description);
+//       marker.openPopup();
 
-      // A weakmap has been initialised as private variable
-      markers.set(workout.id, marker);
+//       // A weakmap has been initialised as private variable
+//       markers.set(workout.id, marker);
 
-      return marker;
-    } catch (err) {
-      throw new Error(`ERROR(${err.code}: ${err.message})`);
-    }
-  };
+//       return marker;
+//     } catch (err) {
+//       throw new Error(`ERROR(${err.code}: ${err.message})`);
+//     }
+//   };
 
-  const removeMapMarker = (workoutId) => {
-    const marker = markers.get(workoutId);
+//   const removeMapMarker = (workoutId) => {
+//     const marker = markers.get(workoutId);
 
-    if (marker) {
-      map.removeLayer(marker);
-      markers.delete(workoutId);
-    }
-  };
+//     if (marker) {
+//       map.removeLayer(marker);
+//       markers.delete(workoutId);
+//     }
+//   };
 
-  const showForm = function () {
-    formContainer.classList.remove('form__hide');
-    formEl.classList.add('active');
-    formEl.classList.remove('visually-hide');
-    workoutsContainer.classList.add('form__not-hidden');
-  };
+//   const showForm = function () {
+//     formContainer.classList.remove('form__hide');
+//     formEl.classList.add('active');
+//     formEl.classList.remove('visually-hide');
+//     workoutsContainer.classList.add('form__not-hidden');
+//   };
 
-  const hideForm = function () {
-    formContainer.classList.remove('form__hide');
-    formEl.classList.remove('active');
-    formEl.classList.add('visually-hide');
-    workoutsContainer.classList.remove('form__not-hidden');
-  };
+//   const hideForm = function () {
+//     formContainer.classList.remove('form__hide');
+//     formEl.classList.remove('active');
+//     formEl.classList.add('visually-hide');
+//     workoutsContainer.classList.remove('form__not-hidden');
+//   };
 
-  const renderWorkout = function (workout) {
-    const workoutList = document.querySelector('.workouts');
+//   const renderWorkout = function (workout) {
+//     const workoutList = document.querySelector('.workouts');
 
-    let html = `
-    <li class="workout workout--${workout.type} [ grid-workout ]" data-id=${workout.id}>
-    <div class="workout__trash">
-    <i class='bx bx-trash'></i>
-    </div>
-    <h2 class="workout__title">${workout.description}</h2>
-    <div class="workout__details">
-      <span class="workout__icon">${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♂️'}</span>
-      <span class="workout__value">${workout.distance}</span>
-      <span class="workout__unit">km</span>
-    </div>
-    <div class="workout__details">
-      <span class="workout__icon">🕑</span>
-      <span class="workout__value">${workout.duration}</span>
-      <span class="workout__unit">min</span>
-    </div>
-    
-    `;
+//     let html = `
+//     <li class="workout workout--${workout.type} [ grid-workout ]" data-id=${workout.id}>
+//     <div class="workout__trash">
+//     <i class='bx bx-trash'></i>
+//     </div>
+//     <h2 class="workout__title">${workout.description}</h2>
+//     <div class="workout__details">
+//       <span class="workout__icon">${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♂️'}</span>
+//       <span class="workout__value">${workout.distance}</span>
+//       <span class="workout__unit">km</span>
+//     </div>
+//     <div class="workout__details">
+//       <span class="workout__icon">🕑</span>
+//       <span class="workout__value">${workout.duration}</span>
+//       <span class="workout__unit">min</span>
+//     </div>
 
-    if (workout.type === 'running') {
-      html += `
-      
+//     `;
 
-      <div class="workout__details">
-              <span class="workout__icon">⚡</span>
-              <span class="workout__value">${workout.pace.toFixed(1)}</span>
-              <span class="workout__unit">min/km</span>
-            </div>
-            <div class="workout__details">
-              <span class="workout__icon">🦶</span>
-              <span class="workout__value">${workout.cadence}</span>
-              <span class="workout__unit">spm</span>
-            </div>
-      
-      `;
-    }
+//     if (workout.type === 'running') {
+//       html += `
 
-    if (workout.type === 'cycling') {
-      html += `
-        
-        <div class="workout__details">
-        <span class="workout__icon">⚡</span>
-        <span class="workout__value">${workout.speed}</span>
-        <span class="workout__unit">min/km</span>
-      </div>
-      <div class="workout__details">
-        <span class="workout__icon">🗻</span>
-        <span class="workout__value">${workout.elevationGain}</span>
-        <span class="workout__unit">m</span>
-      </div>
+//       <div class="workout__details">
+//               <span class="workout__icon">⚡</span>
+//               <span class="workout__value">${workout.pace.toFixed(1)}</span>
+//               <span class="workout__unit">min/km</span>
+//             </div>
+//             <div class="workout__details">
+//               <span class="workout__icon">🦶</span>
+//               <span class="workout__value">${workout.cadence}</span>
+//               <span class="workout__unit">spm</span>
+//             </div>
 
-      `;
-    }
+//       `;
+//     }
 
-    workoutList.insertAdjacentHTML('beforeend', html);
+//     if (workout.type === 'cycling') {
+//       html += `
 
-    // The callback function passed to this function will be executed when a workout is rendered
-    handleTrashbinListener(removeMapMarker);
-  };
+//         <div class="workout__details">
+//         <span class="workout__icon">⚡</span>
+//         <span class="workout__value">${workout.speed}</span>
+//         <span class="workout__unit">min/km</span>
+//       </div>
+//       <div class="workout__details">
+//         <span class="workout__icon">🗻</span>
+//         <span class="workout__value">${workout.elevationGain}</span>
+//         <span class="workout__unit">m</span>
+//       </div>
 
-  const moveToPopup = function (id, workouts) {
-    const workout = workouts.find((work) => work.id === id);
+//       `;
+//     }
 
-    map.setView(workout.coords, workoutZoomLevel, {
-      animate: true,
-      pan: {
-        duration: 1,
-      },
-    });
-  };
+//     workoutList.insertAdjacentHTML('beforeend', html);
 
-  return {
-    getGeoCoords,
-    renderMap,
-    mapOnClick,
-    mapMarker,
-    removeMapMarker,
-    showForm,
-    hideForm,
-    renderWorkout,
-    moveToPopup,
-  };
-};
+//     // The callback function passed to this function will be executed when a workout is rendered
+//     handleTrashbinListener(removeMapMarker);
+//   };
+
+//   const moveToPopup = function (id, workouts) {
+//     const workout = workouts.find((work) => work.id === id);
+
+//     map.setView(workout.coords, workoutZoomLevel, {
+//       animate: true,
+//       pan: {
+//         duration: 1,
+//       },
+//     });
+//   };
+
+//   return {
+//     getGeoCoords,
+//     renderMap,
+//     mapOnClick,
+//     mapMarker,
+//     removeMapMarker,
+//     showForm,
+//     hideForm,
+//     renderWorkout,
+//     moveToPopup,
+//   };
+// };
 
 const clearInputs = (...fields) => {
   fields.forEach((field) => {
@@ -553,56 +552,203 @@ const workoutListener = function (event, appInstance) {
   appInstance.moveToPopup(workoutId, allWorkouts);
 };
 
-const init = async () => {
-  // Creating an instance of the app function that returns an object with all the methods and properties
-  const appInstance = app((removeMapMarker) => {
-    // a callback function here to pass in the removeMapMarker function to handleTrashbinListener function
-    handleTrashbinListener(removeMapMarker);
-  });
+// const init = async () => {
+//   // Creating an instance of the app function that returns an object with all the methods and properties
+//   const appInstance = app((removeMapMarker) => {
+//     // a callback function here to pass in the removeMapMarker function to handleTrashbinListener function
+//     handleTrashbinListener(removeMapMarker);
+//   });
 
-  // Lets wrap the rest of the code within a try catch block, to await the Promise object to either resolve or reject
+//   // Lets wrap the rest of the code within a try catch block, to await the Promise object to either resolve or reject
 
-  try {
-    const coords = await appInstance.getGeoCoords();
-    appInstance.renderMap(coords);
+//   try {
+//     const coords = await appInstance.getGeoCoords();
+//     appInstance.renderMap(coords);
 
-    // Listening to the map element; when the user clicks on the map, the form will be shown: this is a callback function, whene triggered the newCoords will be passed as an argument to the mapOnClick function
-    appInstance.mapOnClick((newCoords) => {
-      // show the form when the user clicks on the map
+//     // Listening to the map element; when the user clicks on the map, the form will be shown: this is a callback function, whene triggered the newCoords will be passed as an argument to the mapOnClick function
+//     appInstance.mapOnClick((newCoords) => {
+//       // show the form when the user clicks on the map
 
-      appInstance.showForm();
-      // listens to the form input type and changes the workout type
-      handleTypeChange();
+//       appInstance.showForm();
+//       // listens to the form input type and changes the workout type
+//       handleTypeChange();
 
-      //  the option once:true ensures that the event listener is immediately removed once added
-      formEl.addEventListener(
-        'submit',
-        (event) => handleFormSubmitListener(event, newCoords, appInstance),
-        { once: true }
-      );
+//       //  the option once:true ensures that the event listener is immediately removed once added
+//       formEl.addEventListener(
+//         'submit',
+//         (event) => handleFormSubmitListener(event, newCoords, appInstance),
+//         { once: true }
+//       );
 
-      // Listening to the workout list element; when user clicks a workout in the list, map will be repositioned to the map marker
+//       // Listening to the workout list element; when user clicks a workout in the list, map will be repositioned to the map marker
 
-      workoutEl.addEventListener('click', (event) =>
-        workoutListener(event, appInstance)
-      );
-    });
+//       workoutEl.addEventListener('click', (event) =>
+//         workoutListener(event, appInstance)
+//       );
+//     });
 
-    // Workouts in localStorage will be retrieved and rendered again on the map, when the browser is reloaded. This needs to be done after the map is rendered and before the mapOnClick function is called.
+//     // Workouts in localStorage will be retrieved and rendered again on the map, when the browser is reloaded. This needs to be done after the map is rendered and before the mapOnClick function is called.
 
-    workoutManager.getFromLocalStorage();
+//     workoutManager.getFromLocalStorage();
 
-    const storedWorkouts = workoutManager.getWorkouts();
+//     const storedWorkouts = workoutManager.getWorkouts();
 
-    if (storedWorkouts.length > 0) {
-      storedWorkouts.forEach((workout) => {
-        appInstance.renderWorkout(workout);
-        appInstance.mapMarker(workout.coords, workout);
-      });
-    }
-  } catch (error) {
-    showModal(error.message);
+//     if (storedWorkouts.length > 0) {
+//       storedWorkouts.forEach((workout) => {
+//         appInstance.renderWorkout(workout);
+//         appInstance.mapMarker(workout.coords, workout);
+//       });
+//     }
+//   } catch (error) {
+//     showModal(error.message);
+//   }
+// };
+
+// init();
+
+/*
+
+
+* The following code is a refactor of the above code, which utilises the functional programming approach and now diverge from this paradigm to a class based paradigm.
+
+
+*/
+
+// We need to create a app class which will contain all the methods and properties that we need to use in the app
+
+class App {
+  // private properties
+  #map;
+
+  #mapZoomLevel = 13;
+
+  #mapEvent;
+
+  #workouts;
+
+  constructor() {
+    // this is a constructor function that will be immediately executed when this class is instantiated
+    // app methods here will be immediately invoked
+
+    this.#map = null;
+
+    this.#workouts = [];
+
+    // this.#getGeoCoords();
+    // this.#renderMap();
+    // this.#showForm();
   }
-};
 
-init();
+  // static method
+
+  static async #getGeoCoords() {
+    // if success
+    const success = (position) => {
+      const { latitude: lat, longitude: lng } = position.coords;
+
+      const coords = [lat, lng];
+
+      return coords;
+    };
+
+    const error = (err) => {
+      if (err) {
+        throw new Error(`${err.code} : ${err.message}`);
+      }
+    };
+
+    return new Promise((resolve, reject) => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => resolve(success(position)),
+          (err) => reject(error(err))
+        );
+      } else {
+        throw new Error('Geolocation is not supported by your browser');
+      }
+    });
+  }
+
+  #renderMap(coords) {
+    this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(this.#map);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  #getNewGeoCoords = (mapObj) => {
+    const { lat, lng } = mapObj.latlng;
+
+    const newCoords = [lat, lng];
+
+    return newCoords;
+  };
+
+  #mapOnClick() {
+    this.#map.on('click', (mapE) => {
+      this.#mapEvent = mapE;
+
+      const newCoords = this.#getNewGeoCoords(this.#mapEvent);
+      console.log(newCoords);
+      this.#handleNewCoords(newCoords);
+    });
+  }
+
+  #mapMarker(coords) {
+    if (!this.#map) {
+      throw new Error('Map not initialized');
+    }
+
+    try {
+      const marker = L.marker(coords);
+      marker.addTo(this.#map);
+
+      const popup = L.popup({
+        maxWidth: 300,
+        minWidth: 100,
+        autoClose: false,
+        closeOnClick: false,
+        className: `running-popup`,
+      });
+
+      marker.bindPopup(popup);
+      marker.setPopupContent('workout');
+      marker.openPopup();
+
+      // A weakmap has been initialised as private variable
+      // markers.set(workout.id, marker);
+
+      return marker;
+    } catch (err) {
+      throw new Error(`ERROR(${err.code}: ${err.message})`);
+    }
+  }
+
+  #handleNewCoords(coords) {
+    this.#mapMarker(coords);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  async init() {
+    try {
+      const coords = await App.#getGeoCoords();
+
+      this.#renderMap(coords);
+
+      console.log(coords);
+
+      this.#mapOnClick();
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  }
+}
+
+const app = new App();
+
+await app.init().catch((error) => {
+  console.error(error.message);
+});
