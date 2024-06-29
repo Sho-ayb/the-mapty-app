@@ -907,12 +907,12 @@ class App {
 
       const newCoords = App.#getNewGeoCoords(this.#mapEvent);
       console.log(newCoords);
-      this.#mapMarker(newCoords);
+
       callback(newCoords);
     });
   }
 
-  #mapMarker(coords) {
+  #mapMarker(coords, workout) {
     if (!this.#map) {
       throw new Error('Map not initialized');
     }
@@ -926,11 +926,13 @@ class App {
         minWidth: 100,
         autoClose: false,
         closeOnClick: false,
-        className: `running-popup`,
+        className: `${workout.type}-popup`,
       });
 
       marker.bindPopup(popup);
-      marker.setPopupContent('workout');
+      marker.setPopupContent(
+        `${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♂️'} ${workout.description}`
+      );
       marker.openPopup();
 
       // A weakmap has been initialised as private variable
@@ -943,8 +945,6 @@ class App {
   }
 
   #moveToMarker(workout) {
-    console.log('working here ');
-
     this.#map.setView(workout.coords, this.#mapZoomLevel, {
       animate: true,
       pan: {
@@ -979,6 +979,8 @@ class App {
     App.#renderWorkout(workout);
 
     console.log('Workouts: ', this.#workouts);
+
+    return workout;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -997,10 +999,24 @@ class App {
     try {
       if (type === 'running') {
         App.#handleInputs(distance, duration, cadence);
-        this.#createNewWorkout(type, coords, distance, duration, cadence);
+        const workout = this.#createNewWorkout(
+          type,
+          coords,
+          distance,
+          duration,
+          cadence
+        );
+        this.#mapMarker(coords, workout);
       } else if (type === 'cycling') {
         App.#handleInputs(distance, duration, elevation);
-        this.#createNewWorkout(type, coords, distance, duration, elevation);
+        const workout = this.#createNewWorkout(
+          type,
+          coords,
+          distance,
+          duration,
+          elevation
+        );
+        this.#mapMarker(coords, workout);
       }
     } catch (error) {
       App.#showModal(error.message);
