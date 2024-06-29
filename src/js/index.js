@@ -539,18 +539,18 @@ const handleTrashbinListener = (removeMapMarker) => {
   }
 };
 
-const workoutListener = function (event, appInstance) {
-  const workout = event.target.closest('.workout');
+// const workoutListener = function (event, appInstance) {
+//   const workout = event.target.closest('.workout');
 
-  // gaurd clause
-  if (!workout) return;
+//   // gaurd clause
+//   if (!workout) return;
 
-  const workoutId = workout.dataset.id;
+//   const workoutId = workout.dataset.id;
 
-  const allWorkouts = workoutManager.getWorkouts();
+//   const allWorkouts = workoutManager.getWorkouts();
 
-  appInstance.moveToPopup(workoutId, allWorkouts);
-};
+//   appInstance.moveToPopup(workoutId, allWorkouts);
+// };
 
 // const init = async () => {
 //   // Creating an instance of the app function that returns an object with all the methods and properties
@@ -619,7 +619,11 @@ const workoutListener = function (event, appInstance) {
 class Workout {
   date = new Date();
 
-  #id = this.date.toISOString();
+  id = this.date
+    .toISOString()
+    .split(/[-:T.Z]/)
+    .join('')
+    .slice(-10);
 
   constructor(coords, distance, duration) {
     this.coords = coords;
@@ -631,7 +635,9 @@ class Workout {
     // prettier-ignore
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-    this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${months[this.date.getMonth()]} ${this.date.getDate()}`;
+    console.log('Id: ', this.id);
+
+    this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on  ${this.date.getDate()} ${months[this.date.getMonth()]} ${this.date.getFullYear()}`;
   }
 }
 
@@ -936,6 +942,17 @@ class App {
     }
   }
 
+  #moveToMarker(workout) {
+    console.log('working here ');
+
+    this.#map.setView(workout.coords, this.#mapZoomLevel, {
+      animate: true,
+      pan: {
+        duration: 1,
+      },
+    });
+  }
+
   // eslint-disable-next-line class-methods-use-this
   #createNewWorkout(type, ...inputs) {
     let workout;
@@ -1003,9 +1020,27 @@ class App {
         this.#handleFormSubmit(event, newCoords);
       };
 
+      const workoutListener = (event) => {
+        const workout = event.target.closest('.workout');
+
+        const workoutId = workout.dataset.id;
+
+        console.log(workoutId);
+
+        const foundWorkout = this.#workouts.find(
+          (work) => work.id === workoutId
+        );
+
+        console.log(foundWorkout);
+
+        this.#moveToMarker(foundWorkout);
+      };
+
       formEl.addEventListener('submit', submitHandler.bind(this), {
         once: true,
       });
+
+      workoutEl.addEventListener('click', workoutListener.bind(this));
     });
   }
 
