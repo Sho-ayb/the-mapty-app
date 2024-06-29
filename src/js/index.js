@@ -691,7 +691,7 @@ class App {
 
   #mapEvent;
 
-  #workouts;
+  #workouts = [];
 
   constructor() {
     // this is a constructor function that will be immediately executed when this class is instantiated
@@ -814,13 +814,75 @@ class App {
     };
   }
 
-  static #getNewGeoCoords = (mapObj) => {
+  static #getNewGeoCoords(mapObj) {
     const { lat, lng } = mapObj.latlng;
 
     const newCoords = [lat, lng];
 
     return newCoords;
-  };
+  }
+
+  static #renderWorkout(workout) {
+    const workoutList = document.querySelector('.workouts');
+
+    let html = `
+        <li class="workout workout--${workout.type} [ grid-workout ]" data-id=${workout.id}>
+        <div class="workout__trash">
+        <i class='bx bx-trash'></i>
+        </div>
+        <h2 class="workout__title">${workout.description}</h2>
+        <div class="workout__details">
+          <span class="workout__icon">${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♂️'}</span>
+          <span class="workout__value">${workout.distance}</span>
+          <span class="workout__unit">km</span>
+        </div>
+        <div class="workout__details">
+          <span class="workout__icon">🕑</span>
+          <span class="workout__value">${workout.duration}</span>
+          <span class="workout__unit">min</span>
+        </div>
+    
+        `;
+
+    if (workout.type === 'running') {
+      html += `
+    
+          <div class="workout__details">
+                  <span class="workout__icon">⚡</span>
+                  <span class="workout__value">${workout.pace.toFixed(1)}</span>
+                  <span class="workout__unit">min/km</span>
+                </div>
+                <div class="workout__details">
+                  <span class="workout__icon">🦶</span>
+                  <span class="workout__value">${workout.cadence}</span>
+                  <span class="workout__unit">spm</span>
+                </div>
+    
+          `;
+    }
+
+    if (workout.type === 'cycling') {
+      html += `
+    
+            <div class="workout__details">
+            <span class="workout__icon">⚡</span>
+            <span class="workout__value">${workout.speed}</span>
+            <span class="workout__unit">min/km</span>
+          </div>
+          <div class="workout__details">
+            <span class="workout__icon">🗻</span>
+            <span class="workout__value">${workout.elevationGain}</span>
+            <span class="workout__unit">m</span>
+          </div>
+    
+          `;
+    }
+
+    workoutList.insertAdjacentHTML('beforeend', html);
+
+    // The callback function passed to this function will be executed when a workout is rendered
+    // handleTrashbinListener(removeMapMarker);
+  }
 
   // Instance methods
 
@@ -876,13 +938,17 @@ class App {
 
   // eslint-disable-next-line class-methods-use-this
   #createNewWorkout(type, ...inputs) {
+    let workout;
+
+    const addWorkout = () => {
+      this.#workouts = [...this.#workouts, workout];
+    };
+
     console.log(type, inputs);
 
     const [coords, distance, duration, cadenceOrElevation] = inputs;
 
     console.log(coords, distance, duration, cadenceOrElevation);
-
-    let workout;
 
     if (type === 'running') {
       workout = new Running(coords, distance, duration, cadenceOrElevation);
@@ -890,7 +956,12 @@ class App {
       workout = new Cycling(coords, distance, duration, cadenceOrElevation);
     }
 
-    console.log(workout);
+    console.log('Workout: ', workout);
+
+    addWorkout();
+    App.#renderWorkout(workout);
+
+    console.log('Workouts: ', this.#workouts);
   }
 
   // eslint-disable-next-line class-methods-use-this
