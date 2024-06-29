@@ -614,6 +614,73 @@ const workoutListener = function (event, appInstance) {
 
 */
 
+// The workout object
+
+class Workout {
+  date = new Date();
+
+  #id = this.date.toISOString();
+
+  constructor(coords, distance, duration) {
+    this.coords = coords;
+    this.distance = distance;
+    this.duration = duration;
+  }
+
+  setDescription() {
+    // prettier-ignore
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${months[this.date.getMonth()]} ${this.date.getDate()}`;
+  }
+}
+
+// The Running class extends the Workout class
+
+class Running extends Workout {
+  type = 'running';
+
+  constructor(coords, distance, duration, cadence) {
+    super(coords, distance, duration);
+
+    this.cadence = cadence;
+
+    this.calcPace();
+
+    this.setDescription();
+  }
+
+  calcPace() {
+    // min/km
+    this.pace = this.duration / this.distance;
+
+    return this.pace;
+  }
+}
+
+// The Cycling class extends the Workout class
+
+class Cycling extends Workout {
+  type = 'Cycling';
+
+  constructor(coords, distance, duration, elevationGain) {
+    super(coords, distance, duration);
+
+    this.elevationGain = elevationGain;
+
+    this.calcSpeed();
+
+    this.setDescription();
+  }
+
+  calcSpeed() {
+    // km/h
+    this.speed = this.distance / (this.duration / 60);
+
+    return this.speed;
+  }
+}
+
 // We need to create a app class which will contain all the methods and properties that we need to use in the app
 
 class App {
@@ -633,13 +700,9 @@ class App {
     this.#map = null;
 
     this.#workouts = [];
-
-    // this.#getGeoCoords();
-    // this.#renderMap();
-    // this.#showForm();
   }
 
-  // static method
+  // Static methods
 
   static async #getGeoCoords() {
     // if success
@@ -669,6 +732,98 @@ class App {
     });
   }
 
+  static #showForm() {
+    formContainer.classList.remove('form__hide');
+    formEl.classList.add('active');
+    formEl.classList.remove('visually-hide');
+    workoutsContainer.classList.add('form__not-hidden');
+  }
+
+  static hideForm() {
+    formContainer.classList.remove('form__hide');
+    formEl.classList.remove('active');
+    formEl.classList.add('visually-hide');
+    workoutsContainer.classList.remove('form__not-hidden');
+  }
+
+  // Checking the form selection type
+
+  static handleTypeChange() {
+    typeSelection.addEventListener('change', () => {
+      const selectedType = typeSelection.value;
+
+      if (selectedType === 'running') {
+        cadenceInput.parentElement.classList.remove('hidden');
+        elevationGainInput.parentElement.classList.add('hidden');
+      }
+
+      if (selectedType === 'cycling') {
+        cadenceInput.parentElement.classList.add('hidden');
+        elevationGainInput.parentElement.classList.remove('hidden');
+      }
+    });
+  }
+
+  // Checking if all inputs are valid numerals
+  static #validInputs(...inputs) {
+    return inputs.every((inp) => Number.isFinite(inp));
+  }
+
+  // Checking if all inputs are positive numbers
+
+  static #allPositive(...inputs) {
+    return inputs.every((inp) => inp > 0);
+  }
+
+  static #handleInputs(type, distance, duration, cadence, elevation) {
+    if (type === 'running') {
+      if (
+        !validInputs(distance, duration, cadence) ||
+        !allPositive(distance, duration, cadence)
+      ) {
+        throw new Error('Inputs for running must be positive numbers!');
+      }
+    } else if (type === 'cycling') {
+      if (
+        !validInputs(distance, duration, elevation) &&
+        !allPositive(distance, duration)
+      ) {
+        throw new Error(
+          'Inputs for distance and duration must be positive numbers!'
+        );
+      }
+    }
+  }
+
+  static #showModal(errorMsg) {
+    const modal = document.getElementById('modal');
+    const closeModal = document.querySelector('.modal__close');
+    const modalMsg = document.querySelector('.modal__message');
+
+    modal.classList.remove('hidden');
+    formEl.classList.add('visually-hide');
+
+    modalMsg.textContent = errorMsg;
+
+    closeModal.onclick = function () {
+      modal.classList.add('hidden');
+    };
+
+    window.onclick = function () {
+      modal.classList.add('hidden');
+    };
+  }
+
+  static #getNewGeoCoords = (mapObj) => {
+    const { lat, lng } = mapObj.latlng;
+
+    const newCoords = [lat, lng];
+
+    return newCoords;
+  };
+
+  // Instance methods
+
   #renderMap(coords) {
     this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
 
@@ -678,22 +833,14 @@ class App {
     }).addTo(this.#map);
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  #getNewGeoCoords = (mapObj) => {
-    const { lat, lng } = mapObj.latlng;
-
-    const newCoords = [lat, lng];
-
-    return newCoords;
-  };
-
-  #mapOnClick() {
+  #mapOnClick(callback) {
     this.#map.on('click', (mapE) => {
       this.#mapEvent = mapE;
 
-      const newCoords = this.#getNewGeoCoords(this.#mapEvent);
+      const newCoords = App.#getNewGeoCoords(this.#mapEvent);
       console.log(newCoords);
-      this.#handleNewCoords(newCoords);
+      this.#mapMarker(newCoords);
+      callback(newCoords);
     });
   }
 
@@ -727,8 +874,68 @@ class App {
     }
   }
 
-  #handleNewCoords(coords) {
-    this.#mapMarker(coords);
+  // eslint-disable-next-line class-methods-use-this
+  #createNewWorkout(type, ...inputs) {
+    console.log(type, inputs);
+
+    const [coords, distance, duration, cadenceOrElevation] = inputs;
+
+    console.log(coords, distance, duration, cadenceOrElevation);
+
+    let workout;
+
+    if (type === 'running') {
+      workout = new Running(coords, distance, duration, cadenceOrElevation);
+    } else if (type === 'cycling') {
+      workout = new Cycling(coords, distance, duration, cadenceOrElevation);
+    }
+
+    console.log(workout);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  #handleFormSubmit(event, coords) {
+    event.preventDefault();
+
+    const formData = new FormData(event.target);
+    const type = formData.get('type');
+    const distance = Number(formData.get('distance'));
+    const duration = Number(formData.get('duration'));
+    const cadence = Number(formData.get('cadence'));
+    const elevation = Number(formData.get('elev-gain'));
+
+    console.log(type, coords, distance, duration, cadence, elevation);
+
+    try {
+      if (type === 'running') {
+        App.#handleInputs(distance, duration, cadence);
+        this.#createNewWorkout(type, coords, distance, duration, cadence);
+      } else if (type === 'cycling') {
+        App.#handleInputs(distance, duration, elevation);
+        this.#createNewWorkout(type, coords, distance, duration, elevation);
+      }
+    } catch (error) {
+      App.#showModal(error.message);
+      return;
+    }
+
+    App.hideForm();
+  }
+
+  #setupEventListeners() {
+    this.#mapOnClick((newCoords) => {
+      App.#showForm();
+      App.handleTypeChange();
+
+      // closure to capture the event and pass in newCoords
+      const submitHandler = (event) => {
+        this.#handleFormSubmit(event, newCoords);
+      };
+
+      formEl.addEventListener('submit', submitHandler.bind(this), {
+        once: true,
+      });
+    });
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -740,9 +947,9 @@ class App {
 
       console.log(coords);
 
-      this.#mapOnClick();
+      this.#setupEventListeners();
     } catch (error) {
-      throw new Error(error.message);
+      App.#showModal(error.message);
     }
   }
 }
@@ -750,5 +957,5 @@ class App {
 const app = new App();
 
 await app.init().catch((error) => {
-  console.error(error.message);
+  console.error(`${error.code}: ${error.message}`);
 });

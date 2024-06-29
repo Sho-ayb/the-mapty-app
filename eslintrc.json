@@ -15,6 +15,7 @@
     "no-console": "off",
     "func-names": "off",
     "no-debugger": "off",
+    "max-classes-per-file": ["error", 4],
     "prettier/prettier": [
       "error",
       { "singleQuote": true, "trailingComma": "es5" }
