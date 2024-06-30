@@ -1027,11 +1027,10 @@ class App {
       // Lets use findIndex this time to remove the workout
       const index = this.#workouts.findIndex((workout) => workout.id === id);
 
-      if (index === -1) {
+      if (index !== -1) {
         this.#workouts.splice(index, 1);
-
-        saveToLocalStorage();
       }
+      saveToLocalStorage();
     };
 
     // Get all workouts
@@ -1127,16 +1126,9 @@ class App {
       };
 
       const workoutListener = (event) => {
-        // If the user hasn't clicked on the trashbin then the map is moved to the marker
-        const foundWorkout = findWorkout(event);
-        this.#moveToMarker(foundWorkout);
         const trashbinEl = event.target.closest(
           '.workout .workout__trash > i.bx.bx-trash'
         );
-
-        if (trashbinEl === null) return;
-
-        console.log(trashbinEl);
 
         if (trashbinEl) {
           event.stopPropagation();
@@ -1149,6 +1141,14 @@ class App {
           workout.remove();
           // removes the map marker
           this.#removeMapMarker(workoutId);
+          return;
+        }
+        // If the user hasn't clicked on the trashbin then the map is moved to the marker
+
+        const foundWorkout = findWorkout(event);
+        console.log(foundWorkout);
+        if (foundWorkout) {
+          this.#moveToMarker(foundWorkout);
         }
       };
 
