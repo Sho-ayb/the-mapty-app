@@ -1125,39 +1125,39 @@ class App {
         workoutManager.saveToLocalStorage();
       };
 
-      const workoutListener = (event) => {
-        const trashbinEl = event.target.closest(
-          '.workout .workout__trash > i.bx.bx-trash'
-        );
-
-        if (trashbinEl) {
-          event.stopPropagation();
-          const workout = trashbinEl.closest('.workout');
-          const workoutId = workout.dataset.id;
-
-          // removes from local storage and the workouts array
-          workoutManager.removeWorkout(workoutId);
-          // removes the workout from the DOM
-          workout.remove();
-          // removes the map marker
-          this.#removeMapMarker(workoutId);
-          return;
-        }
-        // If the user hasn't clicked on the trashbin then the map is moved to the marker
-
-        const foundWorkout = findWorkout(event);
-        console.log(foundWorkout);
-        if (foundWorkout) {
-          this.#moveToMarker(foundWorkout);
-        }
-      };
-
       formEl.addEventListener('submit', submitHandler.bind(this), {
         once: true,
       });
-
-      workoutEl.addEventListener('click', workoutListener.bind(this));
     });
+
+    const workoutListener = (event) => {
+      const trashbinEl = event.target.closest(
+        '.workout .workout__trash > i.bx.bx-trash'
+      );
+
+      if (trashbinEl) {
+        event.stopPropagation();
+        const workout = trashbinEl.closest('.workout');
+        const workoutId = workout.dataset.id;
+
+        // removes from local storage and the workouts array
+        workoutManager.removeWorkout(workoutId);
+        // removes the workout from the DOM
+        workout.remove();
+        // removes the map marker
+        this.#removeMapMarker(workoutId);
+        return;
+      }
+      // If the user hasn't clicked on the trashbin then the map is moved to the marker
+
+      const foundWorkout = findWorkout(event);
+      console.log(foundWorkout);
+      if (foundWorkout) {
+        this.#moveToMarker(foundWorkout);
+      }
+    };
+
+    workoutEl.addEventListener('click', workoutListener.bind(this));
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -1171,6 +1171,18 @@ class App {
 
       const workoutManager = this.#createWorkoutManager();
 
+      // this.#setupEventListeners(workoutManager);
+
+      workoutManager.getFromLocalStorage();
+      const storedWorkouts = workoutManager.getAllWorkouts();
+      console.log(storedWorkouts);
+
+      if (storedWorkouts) {
+        storedWorkouts.forEach((workout) => {
+          App.#renderWorkout(workout);
+          this.#mapMarker(workout.coords, workout);
+        });
+      }
       this.#setupEventListeners(workoutManager);
     } catch (error) {
       App.#showModal(error.message);
