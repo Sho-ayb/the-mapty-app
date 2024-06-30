@@ -1,9 +1,0 @@
-.visually-hide {
-  transform: translateY(-100%);
-  opacity: 0;
-}
-
-body .main .hidden,
-body [class*="hidden"] {
-  display: none;
-}
