@@ -412,132 +412,132 @@ const createWorkoutObject = function (
   return workout;
 };
 
-const createNewWorkout = function () {
-  let workouts = [];
+// const createNewWorkout = function () {
+//   let workouts = [];
 
-  const addWorkout = (workout) => {
-    workouts = [...workouts, workout];
-  };
+//   const addWorkout = (workout) => {
+//     workouts = [...workouts, workout];
+//   };
 
-  const saveToLocalStorage = () => {
-    localStorage.setItem('workouts', JSON.stringify(workouts));
-  };
+//   const saveToLocalStorage = () => {
+//     localStorage.setItem('workouts', JSON.stringify(workouts));
+//   };
 
-  const getFromLocalStorage = () => {
-    const data = JSON.parse(localStorage.getItem('workouts')) || [];
+//   const getFromLocalStorage = () => {
+//     const data = JSON.parse(localStorage.getItem('workouts')) || [];
 
-    if (!data) return;
+//     if (!data) return;
 
-    workouts = data;
-  };
+//     workouts = data;
+//   };
 
-  const deleteFromLocalStorage = (workout) => {
-    const workoutId = workout.dataset.id;
+//   const deleteFromLocalStorage = (workout) => {
+//     const workoutId = workout.dataset.id;
 
-    const updatedWorkouts = workouts.filter((work) => work.id !== workoutId);
+//     const updatedWorkouts = workouts.filter((work) => work.id !== workoutId);
 
-    workouts = updatedWorkouts;
+//     workouts = updatedWorkouts;
 
-    saveToLocalStorage();
-  };
+//     saveToLocalStorage();
+//   };
 
-  const removeWorkoutFromDom = (workout) => {
-    workout.remove();
-  };
+//   const removeWorkoutFromDom = (workout) => {
+//     workout.remove();
+//   };
 
-  const getWorkouts = () => workouts;
+//   const getWorkouts = () => workouts;
 
-  return {
-    addWorkout,
-    saveToLocalStorage,
-    getFromLocalStorage,
-    deleteFromLocalStorage,
-    removeWorkoutFromDom,
-    getWorkouts,
-  };
-};
+//   return {
+//     addWorkout,
+//     saveToLocalStorage,
+//     getFromLocalStorage,
+//     deleteFromLocalStorage,
+//     removeWorkoutFromDom,
+//     getWorkouts,
+//   };
+// };
 
-// Creating a closure here
+// // Creating a closure here
 
-const workoutManager = createNewWorkout();
+// // const workoutManager = createNewWorkout();
 
-const handleFormSubmit = function (event, newCoords, appInstance) {
-  event.preventDefault();
+// const handleFormSubmit = function (event, newCoords, appInstance) {
+//   event.preventDefault();
 
-  const formData = new FormData(event.target);
-  const type = formData.get('type');
-  const distance = Number(formData.get('distance'));
-  const duration = Number(formData.get('duration'));
-  const cadence = Number(formData.get('cadence'));
-  const elevation = Number(formData.get('elev-gain'));
+//   const formData = new FormData(event.target);
+//   const type = formData.get('type');
+//   const distance = Number(formData.get('distance'));
+//   const duration = Number(formData.get('duration'));
+//   const cadence = Number(formData.get('cadence'));
+//   const elevation = Number(formData.get('elev-gain'));
 
-  console.log(type, distance, duration, cadence, elevation);
+//   console.log(type, distance, duration, cadence, elevation);
 
-  try {
-    if (type === 'running') {
-      handleInputs(type, distance, duration, cadence);
-    } else if (type === 'cycling') {
-      handleInputs(type, distance, duration, elevation);
-    }
+//   try {
+//     if (type === 'running') {
+//       handleInputs(type, distance, duration, cadence);
+//     } else if (type === 'cycling') {
+//       handleInputs(type, distance, duration, elevation);
+//     }
 
-    // Create a date for the new workout
+//     // Create a date for the new workout
 
-    const date = new Date();
+//     const date = new Date();
 
-    const newWorkout = createWorkoutObject(
-      type,
-      distance,
-      duration,
-      cadence,
-      elevation,
-      date,
-      newCoords
-    );
+//     const newWorkout = createWorkoutObject(
+//       type,
+//       distance,
+//       duration,
+//       cadence,
+//       elevation,
+//       date,
+//       newCoords
+//     );
 
-    console.log(newWorkout);
+//     console.log(newWorkout);
 
-    workoutManager.addWorkout(newWorkout);
-    workoutManager.saveToLocalStorage();
+//     workoutManager.addWorkout(newWorkout);
+//     workoutManager.saveToLocalStorage();
 
-    const coords = newCoords;
+//     const coords = newCoords;
 
-    appInstance.renderWorkout(newWorkout);
-    appInstance.mapMarker(coords, newWorkout);
+//     appInstance.renderWorkout(newWorkout);
+//     appInstance.mapMarker(coords, newWorkout);
 
-    appInstance.hideForm();
+//     appInstance.hideForm();
 
-    clearInputs(distanceInput, durationInput, cadenceInput, elevationGainInput);
-  } catch (error) {
-    showModal(error.message);
-    clearInputs(distanceInput, durationInput, cadenceInput, elevationGainInput);
-  }
-};
+//     clearInputs(distanceInput, durationInput, cadenceInput, elevationGainInput);
+//   } catch (error) {
+//     showModal(error.message);
+//     clearInputs(distanceInput, durationInput, cadenceInput, elevationGainInput);
+//   }
+// };
 
-const handleFormSubmitListener = function (event, newCoords, appInstance) {
-  handleFormSubmit(event, newCoords, appInstance);
-};
+// const handleFormSubmitListener = function (event, newCoords, appInstance) {
+//   handleFormSubmit(event, newCoords, appInstance);
+// };
 
-const handleTrashbinListener = (removeMapMarker) => {
-  const trashbinEl = document.querySelectorAll(
-    '.workout__trash > i.bx.bx-trash'
-  );
+// const handleTrashbinListener = (removeMapMarker) => {
+//   const trashbinEl = document.querySelectorAll(
+//     '.workout__trash > i.bx.bx-trash'
+//   );
 
-  console.log(trashbinEl);
+//   console.log(trashbinEl);
 
-  if (trashbinEl) {
-    trashbinEl.forEach((el) => {
-      el.addEventListener('click', (e) => {
-        e.stopPropagation(); // prevents the event from bubbling up to the parent element
-        console.log(el.closest('.workout'));
-        const workout = el.closest('.workout');
-        const workoutId = workout.dataset.id;
-        workoutManager.deleteFromLocalStorage(workout);
-        workoutManager.removeWorkoutFromDom(workout);
-        removeMapMarker(workoutId);
-      });
-    });
-  }
-};
+//   if (trashbinEl) {
+//     trashbinEl.forEach((el) => {
+//       el.addEventListener('click', (e) => {
+//         e.stopPropagation(); // prevents the event from bubbling up to the parent element
+//         console.log(el.closest('.workout'));
+//         const workout = el.closest('.workout');
+//         const workoutId = workout.dataset.id;
+//         workoutManager.deleteFromLocalStorage(workout);
+//         workoutManager.removeWorkoutFromDom(workout);
+//         removeMapMarker(workoutId);
+//       });
+//     });
+//   }
+// };
 
 // const workoutListener = function (event, appInstance) {
 //   const workout = event.target.closest('.workout');
@@ -667,7 +667,7 @@ class Running extends Workout {
 // The Cycling class extends the Workout class
 
 class Cycling extends Workout {
-  type = 'Cycling';
+  type = 'cycling';
 
   constructor(coords, distance, duration, elevationGain) {
     super(coords, distance, duration);
@@ -698,6 +698,8 @@ class App {
   #mapEvent;
 
   #workouts = [];
+
+  #markers = new Map();
 
   constructor() {
     // this is a constructor function that will be immediately executed when this class is instantiated
@@ -890,6 +892,18 @@ class App {
     // handleTrashbinListener(removeMapMarker);
   }
 
+  static #clearInputs(...fields) {
+    fields.forEach((field) => {
+      // because of eslint rule no-reassign
+      const temp = field;
+
+      // gaurd clause to check for null value
+      if (temp) {
+        temp.value = '';
+      }
+    });
+  }
+
   // Instance methods
 
   #renderMap(coords) {
@@ -935,12 +949,20 @@ class App {
       );
       marker.openPopup();
 
-      // A weakmap has been initialised as private variable
-      // markers.set(workout.id, marker);
+      // A Map has been initialised as private variable
 
-      return marker;
+      this.#markers.set(workout.id, marker);
     } catch (err) {
       throw new Error(`ERROR(${err.code}: ${err.message})`);
+    }
+  }
+
+  #removeMapMarker(workoutId) {
+    const marker = this.#markers.get(workoutId);
+
+    if (marker) {
+      this.#map.removeLayer(marker);
+      this.#markers.delete(workoutId);
     }
   }
 
@@ -983,6 +1005,50 @@ class App {
     return workout;
   }
 
+  #createWorkoutManager() {
+    // Save to local storage
+
+    const saveToLocalStorage = () => {
+      localStorage.setItem('workouts', JSON.stringify(this.#workouts));
+    };
+
+    // Get from local storage
+
+    const getFromLocalStorage = () => {
+      const data = JSON.parse(localStorage.getItem('workouts')) || [];
+
+      if (!data) return;
+
+      this.#workouts = data;
+    };
+
+    // Delete from workouts array
+    const removeWorkout = (id) => {
+      // Lets use findIndex this time to remove the workout
+      const index = this.#workouts.findIndex((workout) => workout.id === id);
+
+      if (index === -1) {
+        this.#workouts.splice(index, 1);
+
+        saveToLocalStorage();
+      }
+    };
+
+    // Get all workouts
+
+    const getAllWorkouts = () => {
+      const allWorkouts = this.#workouts;
+      return allWorkouts;
+    };
+
+    return {
+      saveToLocalStorage,
+      getFromLocalStorage,
+      removeWorkout,
+      getAllWorkouts,
+    };
+  }
+
   // eslint-disable-next-line class-methods-use-this
   #handleFormSubmit(event, coords) {
     event.preventDefault();
@@ -994,8 +1060,6 @@ class App {
     const cadence = Number(formData.get('cadence'));
     const elevation = Number(formData.get('elev-gain'));
 
-    console.log(type, coords, distance, duration, cadence, elevation);
-
     try {
       if (type === 'running') {
         App.#handleInputs(distance, duration, cadence);
@@ -1006,6 +1070,7 @@ class App {
           duration,
           cadence
         );
+        // Creates the map marker on the map
         this.#mapMarker(coords, workout);
       } else if (type === 'cycling') {
         App.#handleInputs(distance, duration, elevation);
@@ -1016,7 +1081,15 @@ class App {
           duration,
           elevation
         );
+        // Creates the map marker on the map
         this.#mapMarker(coords, workout);
+        // Clears the form inputs
+        App.#clearInputs(
+          distanceInput,
+          durationInput,
+          cadenceInput,
+          elevationGainInput
+        );
       }
     } catch (error) {
       App.#showModal(error.message);
@@ -1026,30 +1099,57 @@ class App {
     App.hideForm();
   }
 
-  #setupEventListeners() {
+  #setupEventListeners(workoutManager) {
+    const findWorkout = (event) => {
+      const workout = event.target.closest('.workout');
+
+      const workoutId = workout.dataset.id;
+
+      const foundWorkout = this.#workouts.find((work) => work.id === workoutId);
+
+      return foundWorkout;
+    };
+
     this.#mapOnClick((newCoords) => {
+      clearInputs(
+        distanceInput,
+        durationInput,
+        cadenceInput,
+        elevationGainInput
+      );
       App.#showForm();
       App.handleTypeChange();
 
       // closure to capture the event and pass in newCoords
       const submitHandler = (event) => {
         this.#handleFormSubmit(event, newCoords);
+        workoutManager.saveToLocalStorage();
       };
 
       const workoutListener = (event) => {
-        const workout = event.target.closest('.workout');
-
-        const workoutId = workout.dataset.id;
-
-        console.log(workoutId);
-
-        const foundWorkout = this.#workouts.find(
-          (work) => work.id === workoutId
+        // If the user hasn't clicked on the trashbin then the map is moved to the marker
+        const foundWorkout = findWorkout(event);
+        this.#moveToMarker(foundWorkout);
+        const trashbinEl = event.target.closest(
+          '.workout .workout__trash > i.bx.bx-trash'
         );
 
-        console.log(foundWorkout);
+        if (trashbinEl === null) return;
 
-        this.#moveToMarker(foundWorkout);
+        console.log(trashbinEl);
+
+        if (trashbinEl) {
+          event.stopPropagation();
+          const workout = trashbinEl.closest('.workout');
+          const workoutId = workout.dataset.id;
+
+          // removes from local storage and the workouts array
+          workoutManager.removeWorkout(workoutId);
+          // removes the workout from the DOM
+          workout.remove();
+          // removes the map marker
+          this.#removeMapMarker(workoutId);
+        }
       };
 
       formEl.addEventListener('submit', submitHandler.bind(this), {
@@ -1069,7 +1169,9 @@ class App {
 
       console.log(coords);
 
-      this.#setupEventListeners();
+      const workoutManager = this.#createWorkoutManager();
+
+      this.#setupEventListeners(workoutManager);
     } catch (error) {
       App.#showModal(error.message);
     }
