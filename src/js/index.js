@@ -566,6 +566,11 @@ const init = async () => {
     const coords = await appInstance.getGeoCoords();
     appInstance.renderMap(coords);
 
+    // Listening to the workout list element; when user clicks a workout in the list, map will be repositioned to the map marker
+
+    workoutEl.addEventListener('click', (event) =>
+      workoutListener(event, appInstance)
+    );
     // Listening to the map element; when the user clicks on the map, the form will be shown: this is a callback function, whene triggered the newCoords will be passed as an argument to the mapOnClick function
     appInstance.mapOnClick((newCoords) => {
       // show the form when the user clicks on the map
@@ -579,12 +584,6 @@ const init = async () => {
         'submit',
         (event) => handleFormSubmitListener(event, newCoords, appInstance),
         { once: true }
-      );
-
-      // Listening to the workout list element; when user clicks a workout in the list, map will be repositioned to the map marker
-
-      workoutEl.addEventListener('click', (event) =>
-        workoutListener(event, appInstance)
       );
     });
 
